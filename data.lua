@@ -1,3 +1,6 @@
+require"prototypes.style"
+require"prototypes.custom-input"
+require"prototypes.sound"
 require"artillery_strike"
 require"SPELLS"
 require"sprint_flames"
@@ -66,13 +69,12 @@ dummy_explosion.flags = {"not-on-map", "placeable-off-grid"}
 dummy_explosion.collision_mask = {}
 dummy_explosion.animations = {
 	{
-		filename = "__m-spell-pack__/graphics/transparent32.png",
+		filename = "__m-spell-pack__/graphics/empty.png",
 		flags = {"compressed"},
-		width = 32,
-		height = 32,
+		width = 1,
+		height = 1,
 		frame_count = 1,
 		line_length = 1,
-		shift = {1, 2},
 		animation_speed = 0.5
 	}
 }
@@ -545,30 +547,3 @@ data:extend({
 		-- target_movement_modifier = 1
 	}
 })
-
-data.raw["gui-style"].default.osp_spirit_progressbar = {
-	type = "progressbar_style",
-	bar_width = 14,
-	height = 33,
-	-- color = {g=1},
-	bar = {filename = "__core__/graphics/gui.png", position = {223, 0}, size = {1, 11}, scale = 1}
-	-- other_colors =
-	-- {
-	--  {less_than = 0.33, color = {r = 1}},
-	--  {less_than = 0.66, color = {r = 1, g = 0.5, b = 0.25}},
-	--  {less_than = 1, color = {g = 1}}
-	-- }
-}
-data.raw["gui-style"].default.osp_mana_progressbar = {
-	type = "progressbar_style",
-	bar_width = 14,
-	height = 33,
-	-- color = {g=1},
-	bar = {filename = "__core__/graphics/gui.png", position = {223, 0}, size = {1, 11}, scale = 1}
-	-- other_colors =
-	-- {
-	--  {less_than = 0.33, color = {r = 1}},
-	--  {less_than = 0.66, color = {r = 1, g = 0.5, b = 0.25}},
-	--  {less_than = 1, color = {g = 1}}
-	-- }
-}

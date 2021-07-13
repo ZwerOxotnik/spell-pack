@@ -20,13 +20,15 @@ spells = {
 		dummy = "grenade",
 		range = 50,
 		func = function(player, position)
-			player.surface.create_entity{name = "osp_blink_fx", position = player.position}
+			local surface = player.surface
+			surface.create_entity{name = "osp_blink_fx", position = player.position}
 			position = max_range(player.position, position, 50) -- range!
-			position = player.surface.find_non_colliding_position("character", position, 5, 0.1)
+			position = surface.find_non_colliding_position("character", position, 5, 0.1)
 			if not position then
 				return false
 			end
-			player.surface.create_entity{name = "osp_blink_fx", position = position}
+			surface.play_sound{path = "entity-mined/sps_blink", position = position}
+			surface.create_entity{name = "osp_blink_fx", position = position}
 			player.teleport(position)
 			return true
 		end

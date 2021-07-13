@@ -469,9 +469,9 @@ script.on_event({defines.events.on_built_entity}, function(event)
 		local spell = spells[spell_name]
 		local verify_inventory = global.verify_inventories[player.index]
 		local cooldowns = player_data.cooldowns
-		if --[[player_data.mana >= spell.mana_cost and player_data.spirit >= spell.spirit_cost and --]] (not verify_inventory or
-			not verify_inventory[spell_name] or verify_inventory[spell_name] + 1 <
-			event.tick) and (not cooldowns[spell_name] or cooldowns[spell_name] < 1) --[[player.get_main_inventory().get_item_count(spell_name) <1--]]
+		if --[[player_data.mana >= spell.mana_cost and player_data.spirit >= spell.spirit_cost and --]]
+			(not verify_inventory or not verify_inventory[spell_name] or verify_inventory[spell_name] + 1 <event.tick)
+			and (not cooldowns[spell_name] or cooldowns[spell_name] < 1) --[[player.get_main_inventory().get_item_count(spell_name) <1--]]
 		then -- and not player.cursor_stack.valid_for_read then -- mana check, cd check
 			-- print(2 .. event.tick)
 			verify_force(player)
@@ -485,7 +485,7 @@ script.on_event({defines.events.on_built_entity}, function(event)
 				end
 				player_data.mana = player_data.mana - spell.mana_cost
 				local plus_max_mana = player_data.max_mana + spell.mana_cost / 300
-				player_data.mana_reg = player_data.mana_reg + plus_max_mana /	200
+				player_data.mana_reg = player_data.mana_reg + plus_max_mana / 200 -- seems wrong
 				player_data.max_mana = player_data.max_mana + plus_max_mana
 				local spirit_cost = spell.spirit_cost
 				if remote.interfaces["dota_scenario_running"] then
@@ -705,3 +705,97 @@ end
 -- end)
 -- script.on_nth_tick(15, function(event)
 -- end)
+
+do
+	local length = 10
+	local blink = spells.osp_blink.func
+	local cooldown = spells.osp_blink.cooldown
+	local spell_mana_cost = spells.osp_blink.mana_cost
+	local spell_spirit_cost = spells.osp_blink.spirit_cost
+	local function on_blink(event, offset)
+		local player = game.get_player(event.player_index)
+		if not (player and player.valid) then return end
+		local character = player.character
+		if not (character and character.valid) then return end
+
+		local player_data = global.players[player.index]
+		local verify_inventory = global.verify_inventories[player.index]
+		local cooldowns = player_data.cooldowns
+		if player_data.mana < spell_mana_cost then
+			error(player, "No mana...")
+			return
+		end
+
+		if (not verify_inventory or not verify_inventory.osp_blink or verify_inventory.osp_blink + 1  <event.tick)
+			and (not cooldowns.osp_blink or cooldowns.osp_blink < 1) --[[player.get_main_inventory().get_item_count(spell_name) <1--]]
+		then -- and not player.cursor_stack.valid_for_read then -- mana check, cd check
+			-- print(2 .. event.tick)
+			local position = character.position
+			-- verify_force(player)
+			local force_data = global.forces[player.force.name]
+			local new_position = offset(position)
+			local success = blink(player, new_position)
+			if success then
+				local effect = player_data.bonus_effects.osp_blink or
+					force_data.bonus_effects.osp_blink
+				if effect then
+					global.bonus_effects[effect](player, new_position)
+				end
+				player_data.mana = player_data.mana - spell_mana_cost
+				local plus_max_mana = player_data.max_mana + spell_mana_cost / 300
+				player_data.mana_reg = player_data.mana_reg + plus_max_mana / 200 -- seems wrong
+				player_data.max_mana = player_data.max_mana + plus_max_mana
+				local spirit_cost = spell_spirit_cost
+				if remote.interfaces["dota_scenario_running"] then
+					remote.call("dota_scenario_running", "modify_spirit", player, -spirit_cost)
+				else
+					player_data.spirit = player_data.spirit - spirit_cost
+					local sc = spirit_cost / 300
+					player_data.spirit_reg = player_data.spirit_reg + sc / 200
+					player_data.max_spirit = player_data.max_spirit + sc
+				end
+				local cd = max(
+					0,
+					(cooldown or 0) * (1 - player_data.cdr - force_data.cdr)
+				)
+				player.insert{name = "osp_blink", count = max(2, floor(cd))}
+				update_mana(player)
+				cooldowns.osp_blink = cd
+				global.clean_cursor[event.player_index] = {name = "osp_blink", count = max(1, floor(cd)), clean = true}
+				player.clear_cursor()
+				if not verify_inventory then
+					verify_inventory = {}
+				end
+				verify_inventory.osp_blink = event.tick
+			else
+				global.clean_cursor[event.player_index] = {name = "osp_blink", count = 1, clean = false}
+			end
+		else
+			global.clean_cursor[event.player_index] = {name = "osp_blink", count = 1, clean = true}
+		end
+	end
+	local left_side = function(pos)
+		return {x = pos.x - length, y = pos.y}
+	end
+	local right_side = function(pos)
+		return {x = pos.x + length, y = pos.y}
+	end
+	local top_side = function(pos)
+		return {x = pos.x, y = pos.y - length}
+	end
+	local bottom_side = function(pos)
+		return {x = pos.x, y = pos.y + length}
+	end
+	script.on_event("use-blink-left", function(event)
+		on_blink(event, left_side)
+	end)
+	script.on_event("use-blink-right", function(event)
+		on_blink(event, right_side)
+	end)
+	script.on_event("use-blink-up", function(event)
+		on_blink(event, top_side)
+	end)
+	script.on_event("use-blink-down", function(event)
+		on_blink(event, bottom_side)
+	end)
+end
