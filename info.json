@@ -6,6 +6,9 @@
   "contact": "zweroxotnik@gmail.com, discord:ZwerOxotnik#7117",
   "homepage": "",
   "factorio_version": "1.1",
-  "dependencies": ["base"],
+  "dependencies": [
+		"base",
+		"! spell-pack"
+	],
   "description": "Adds spells, mana & spirit. (+10 fancy spells)\nAuthor: OwnlyMe\nModified by ZwerOxotnik"
 }
