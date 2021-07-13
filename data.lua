@@ -13,7 +13,7 @@ local item_temp = {
 	type = "item",
 	name = "wooden-chest",
 	icon = "__base__/graphics/icons/wooden-chest.png",
-	icon_size = 32,
+	icon_size = 64,
 	subgroup = "osp_spells",
 	order = "a[items]-a[wooden-chest]",
 	place_result = "wooden-chest",
@@ -24,7 +24,7 @@ local ent_temp = {
 	name = "simple-entity-with-force",
 	render_layer = "object",
 	icon = "__base__/graphics/icons/steel-chest.png",
-	icon_size = 32,
+	icon_size = 64,
 	flags = {"placeable-neutral", "player-creation", "placeable-off-grid", "not-blueprintable"},
 	order = "s-e-w-f",
 	-- minable = {mining_time = 0.1, result = "simple-entity-with-force"},
@@ -176,7 +176,7 @@ data:extend({
 		type = "smoke-with-trigger",
 		name = "osp_blink_fx",
 		icon = "__base__/graphics/icons/biter-spawner.png",
-		icon_size = 32,
+		icon_size = 64,
 		flags = {
 			"not-repairable", "not-blueprintable", "not-deconstructable", "placeable-off-grid", "not-on-map", "placeable-neutral"
 		},
@@ -212,7 +212,7 @@ data:extend({
 		type = "smoke-with-trigger",
 		name = "osp_repair_fx",
 		icon = "__base__/graphics/icons/biter-spawner.png",
-		icon_size = 32,
+		icon_size = 64,
 		flags = {
 			"not-repairable", "not-blueprintable", "not-deconstructable", "placeable-off-grid", "not-on-map", "placeable-neutral"
 		},
@@ -249,7 +249,7 @@ data:extend({
 		name = "osp_repair_radius",
 		render_layer = "object",
 		icon = "__base__/graphics/icons/wooden-chest.png",
-		icon_size = 32,
+		icon_size = 64,
 		flags = {
 			"not-on-map", "not-blueprintable", "not-deconstructable", "not-flammable", "not-selectable-in-game",
 				"not-repairable", "placeable-off-grid"
@@ -340,7 +340,7 @@ data:extend({
 		type = "smoke-with-trigger",
 		name = "osp_revive_fx",
 		icon = "__m-spell-pack__/graphics/revive.png",
-		icon_size = 32,
+		icon_size = 64,
 		flags = {
 			"not-repairable", "not-blueprintable", "not-deconstructable", "placeable-off-grid", "not-on-map", "placeable-neutral"
 		},
