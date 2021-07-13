@@ -1,0 +1,11 @@
+{
+  "name": "spell-pack",
+  "version": "0.18.23",
+  "title": "Spell Pack",
+  "author": "OwnlyMe",
+  "contact": "",
+  "homepage": "",
+  "factorio_version": "0.18",
+  "dependencies": ["base"],
+  "description": "New useful abilities"
+}

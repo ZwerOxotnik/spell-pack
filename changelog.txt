@@ -1,0 +1,78 @@
+0.18.23
+- Improved compatibility with will of the wisps
+- Fixed new game version incompatibility
+
+0.18.21
+- Fixed data structure to work with the newest game version
+
+0.18.21
+- Fixed graphic references for new game version
+
+0.18.20
+- Fixed sound path for new game version
+
+0.17.19
+- Fixed a bug when "show spirits" is disabled
+
+0.17.18
+- Added more remote functions
+- "Blazing fast" now only accelerates the player who casted it, not the whole force
+- (and is multiplicative now)
+- Better integration with "RPG Items"
+
+
+0.17.17
+- Fixed a crash with "Blazing Fast"
+
+0.17.16
+- Polished graphical effects
+- Added a flames effect to sprint (now called "Blazing Fast")
+
+0.17.15
+- Opening the gui of "auto-research" now immediately repositions the bars.
+  Let me know if there are other mods that have a toggleable gui in the top bar.
+
+0.16.15
+- 0.16 Release
+
+0.17.14
+- Rebalanced fireball
+- Improved appearance of the bars
+
+0.17.13
+- Fixed crashes related to and improved the top bar centering
+- Small visual improvements
+
+0.17.12
+- Fixed the algorithm for battery charging
+- Fixed a crash when trying to repair units without unit_number
+- Improved algorithm for Sprint (in vehicle)
+
+0.17.11
+- Added "Artillery Strike"
+- Fixed crashes when a game was loaded while a spell was active
+
+0.17.10
+- Improved fireball visuals
+- Fireball damage now gets increased from grenade bonuses, base damage has been increased by 50%
+- Added an optional visual effect for collecting spirits
+- Using spells now slowly increases their respective resources' max amount and regeneration
+- Fixed some glitches with fireball, on cost of the explosion radius visualization
+- Added visual effects for timewarp and recharge
+
+0.17.9
+- Fixed a crash when using pocket factory
+- Added visual fx for pocket factory, rebuild and teleport
+
+0.17.8
+- Increased teleport range
+- Added repair spell
+
+0.17.7
+- Fixed an issue with teleport
+
+0.17.6
+- Periodically checks if the top bars are centered
+
+0.17.5
+- Fixed bonuses disappearing after death (effects are now force-wide)
