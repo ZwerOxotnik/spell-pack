@@ -9,8 +9,8 @@ Date: 2021-07-13
   Notes:
     - Updated by ZwerOxotnik
     - Refactored code
-    - Not all bugs was fixed
-    - Not all spells work properly on old saves
+    - Not all bugs were fixed
+    - Some scenarios "blocks" spells
 ---------------------------------------------------------------------------------------------------
 Version: 0.18.23
 Date: ?-?-?
