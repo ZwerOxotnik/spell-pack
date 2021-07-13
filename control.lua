@@ -149,10 +149,11 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 	if not player.cursor_stack.valid_for_read then
 		return
 	end
-	if spells[player.cursor_stack.name] then
-		local spell_name = player.cursor_stack.name
-		local mana_cost = spells[spell_name].mana_cost
-		local spirit_cost = spells[spell_name].spirit_cost
+	local spell_name = player.cursor_stack.name
+	local spell = spells[spell_name]
+	if spell then
+		local mana_cost = spell.mana_cost
+		local spirit_cost = spell.spirit_cost
 		local cooldown = player_data.cooldowns[spell_name]
 		if (cooldown and cooldown > 0) then
 			player.clear_cursor()
@@ -163,8 +164,8 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 		elseif player_data.spirit < spirit_cost then
 			player.clear_cursor()
 			error(player, "No Spirit...")
-		elseif spells[spell_name].no_target then
-			local success = spells[spell_name].func(player)
+		elseif spell.no_target then
+			local success = spell.func(player)
 			if success then
 				local effect = player_data.bonus_effects[spell_name]
 				if effect then
@@ -183,7 +184,7 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 					player_data.max_spirit = player_data.max_spirit + sc
 				end
 				update_mana(player)
-				local cd = max(0, (spells[spell_name].cooldown or 0) * (1 - player_data.cdr))
+				local cd = max(0, (spell.cooldown or 0) * (1 - player_data.cdr))
 				player_data.cooldowns[spell_name] = cd
 				global.clean_cursor[player_index] = {name = spell_name, count = max(1, floor(cd)), clean = true}
 			else
