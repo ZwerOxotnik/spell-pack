@@ -1,78 +1,125 @@
-0.18.23
-- Improved compatibility with will of the wisps
-- Fixed new game version incompatibility
+---------------------------------------------------------------------------------------------------
+Version: 0.19.0
+Date: 2021-07-13
+  Changes:
+    - Improved stability
+    - Fixed several bugs
+    - Optimized files
+  Notes:
+    - Updated by ZwerOxotnik
+    - Refactored code
+    - Not all bugs was fixed
+---------------------------------------------------------------------------------------------------
+Version: 0.18.23
+Date: ?-?-?
+  Changes:
+    - Improved compatibility with will of the wisps
+    - Fixed new game version incompatibility
+---------------------------------------------------------------------------------------------------
+Version: 0.18.21
+Date: ?-?-?
+  Changes:
+    - Fixed data structure to work with the newest game version
+    - Fixed graphic references for new game version
+---------------------------------------------------------------------------------------------------
+Version: 0.18.20
+Date: ?-?-?
+  Changes:
+    - Fixed sound path for new game version
+---------------------------------------------------------------------------------------------------
+Version: 0.17.19
+Date: ?-?-?
+  Changes:
+    - Fixed a bug when "show spirits" is disabled
+---------------------------------------------------------------------------------------------------
+Version: 0.17.18
+Date: ?-?-?
+  Changes:
+    - Added more remote functions
+    - "Blazing fast" now only accelerates the player who casted it, not the whole force
+    - (and is multiplicative now)
+    - Better integration with "RPG Items"
+---------------------------------------------------------------------------------------------------
+Version: 0.17.17
+Date: ?-?-?
+  Changes:
+    - Fixed a crash with "Blazing Fast"
+---------------------------------------------------------------------------------------------------
+Version: 0.17.16
+Date: ?-?-?
+  Changes:
+    - Polished graphical effects
+    - Added a flames effect to sprint (now called "Blazing Fast")
+---------------------------------------------------------------------------------------------------
+Version: 0.17.15
+Date: ?-?-?
+  Changes:
+    - Opening the gui of "auto-research" now immediately repositions the bars.\nLet me know if there are other mods that have a toggleable gui in the top bar.
+---------------------------------------------------------------------------------------------------
+Version: 0.16.15
+Date: ?-?-?
+  Changes:
+    - 0.16 Release
+---------------------------------------------------------------------------------------------------
+Version: 0.17.14
+Date: ?-?-?
+  Changes:
+    - Rebalanced fireball
+    - Improved appearance of the bars
+---------------------------------------------------------------------------------------------------
+Version: 0.17.13
+Date: ?-?-?
+  Changes:
+    - Fixed crashes related to and improved the top bar centering
+    - Small visual improvements
+---------------------------------------------------------------------------------------------------
+Version: 0.17.12
+Date: ?-?-?
+  Changes:
+    - Fixed the algorithm for battery charging
+    - Fixed a crash when trying to repair units without unit_number
+    - Improved algorithm for Sprint (in vehicle)
+---------------------------------------------------------------------------------------------------
+Version: 0.17.11
+Date: ?-?-?
+  Changes:
+    - Added "Artillery Strike"
+    - Fixed crashes when a game was loaded while a spell was active
+---------------------------------------------------------------------------------------------------
+Version: 0.17.10
+Date: ?-?-?
+  Changes:
+    - Improved fireball visuals
+    - Fireball damage now gets increased from grenade bonuses, base damage has been increased by 50%
+    - Added an optional visual effect for collecting spirits
+    - Using spells now slowly increases their respective resources' max amount and regeneration
+    - Fixed some glitches with fireball, on cost of the explosion radius visualization
+    - Added visual effects for timewarp and recharge
+---------------------------------------------------------------------------------------------------
+Version: 0.17.9
+Date: ?-?-?
+  Changes:
+    - Fixed a crash when using pocket factory
+    - Added visual fx for pocket factory, rebuild and teleport
 
-0.18.21
-- Fixed data structure to work with the newest game version
-
-0.18.21
-- Fixed graphic references for new game version
-
-0.18.20
-- Fixed sound path for new game version
-
-0.17.19
-- Fixed a bug when "show spirits" is disabled
-
-0.17.18
-- Added more remote functions
-- "Blazing fast" now only accelerates the player who casted it, not the whole force
-- (and is multiplicative now)
-- Better integration with "RPG Items"
-
-
-0.17.17
-- Fixed a crash with "Blazing Fast"
-
-0.17.16
-- Polished graphical effects
-- Added a flames effect to sprint (now called "Blazing Fast")
-
-0.17.15
-- Opening the gui of "auto-research" now immediately repositions the bars.
-  Let me know if there are other mods that have a toggleable gui in the top bar.
-
-0.16.15
-- 0.16 Release
-
-0.17.14
-- Rebalanced fireball
-- Improved appearance of the bars
-
-0.17.13
-- Fixed crashes related to and improved the top bar centering
-- Small visual improvements
-
-0.17.12
-- Fixed the algorithm for battery charging
-- Fixed a crash when trying to repair units without unit_number
-- Improved algorithm for Sprint (in vehicle)
-
-0.17.11
-- Added "Artillery Strike"
-- Fixed crashes when a game was loaded while a spell was active
-
-0.17.10
-- Improved fireball visuals
-- Fireball damage now gets increased from grenade bonuses, base damage has been increased by 50%
-- Added an optional visual effect for collecting spirits
-- Using spells now slowly increases their respective resources' max amount and regeneration
-- Fixed some glitches with fireball, on cost of the explosion radius visualization
-- Added visual effects for timewarp and recharge
-
-0.17.9
-- Fixed a crash when using pocket factory
-- Added visual fx for pocket factory, rebuild and teleport
-
-0.17.8
-- Increased teleport range
-- Added repair spell
-
-0.17.7
-- Fixed an issue with teleport
-
-0.17.6
-- Periodically checks if the top bars are centered
-
-0.17.5
-- Fixed bonuses disappearing after death (effects are now force-wide)
+---------------------------------------------------------------------------------------------------
+Version: 0.17.8
+Date: ?-?-?
+  Changes:
+    - Increased teleport range
+    - Added repair spell
+---------------------------------------------------------------------------------------------------
+Version: 0.17.7
+Date: ?-?-?
+  Changes:
+    - Fixed an issue with teleport
+---------------------------------------------------------------------------------------------------
+Version: 0.17.6
+Date: ?-?-?
+  Changes:
+    - Periodically checks if the top bars are centered
+---------------------------------------------------------------------------------------------------
+Version: 0.17.5
+Date: ?-?-?
+  Changes:
+    - Fixed bonuses disappearing after death (effects are now force-wide)
