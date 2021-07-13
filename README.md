@@ -5,6 +5,8 @@ Spell pack
 
 **Original mod**: https://mods.factorio.com/mod/spell-pack
 
+**Translations**:https://crowdin.com/project/factorio-mods-localization
+
 Adds a few spells, mana & spirit.\
 Mana regenerates constantly, spirit is obtained through kills.\
 Every spell has a unique visual effect.\
