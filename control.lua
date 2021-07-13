@@ -5,6 +5,7 @@ require"SPELLS"
 local min = math.min
 local max = math.max
 local floor = math.floor
+local version = 18
 
 
 remote.add_interface("spell-pack", {
@@ -211,7 +212,7 @@ script.on_init(function()
 	global.bonus_effects = {}
 	global.togglebars = {}
 	global.enabledbars = true
-	global.version = 7
+	global.version = version
 	pcall(register_conditional_event_handlers)
 end)
 
@@ -223,16 +224,16 @@ script.on_event(defines.events.on_player_joined_game, function(event)
 end)
 
 script.on_configuration_changed(function()
-	if not global.version then
-		for _, player in pairs(game.players) do
-			if player.gui.top.player_mana then
-				player.gui.top.player_mana.destroy()
-			end
-			global.players[player.index] = nil
-			create_gui(player)
-		end
-		global.version = 1
-	end
+	-- if not global.version then
+	-- 	for _, player in pairs(game.players) do
+	-- 		if player.gui.top.player_mana then
+	-- 			player.gui.top.player_mana.destroy()
+	-- 		end
+	-- 		global.players[player.index] = nil
+	-- 		create_gui(player)
+	-- 	end
+	-- 	global.version = version
+	-- end
 	-- if global.version < 2 then
 	-- 	global.verify_inventories = {}
 	-- end
@@ -350,28 +351,32 @@ script.on_nth_tick(15, function(event)
 		end
 	end
 	for unit_number, tbl in pairs(global.repairing) do
-		if not tbl.entity or not tbl.entity.valid or tbl.entity.health == 0 or tbl.tick < event.tick - 31 then
-			if tbl.fx and tbl.fx.valid then
-				tbl.fx.destroy()
+		local entity = tbl.entity
+		local fx = tbl.fx
+		if not entity or not entity.valid or entity.health == 0 or tbl.tick < event.tick - 31 then
+			if fx and fx.valid then
+				fx.destroy()
 			end
 			global.repairing[unit_number] = nil
 		else
-			if not tbl.fx or not tbl.fx.valid and tbl.entity.type ~= "locomotive" and tbl.entity.type ~= "cargo-wagon" and
-							tbl.entity.type ~= "fluid-wagon" and tbl.entity.type ~= "artillery-wagon" then
-				if tbl.entity.type == "car" then
-					tbl.fx = tbl.entity.surface.create_entity{
+			local entity_type = entity.type
+			if not fx or not fx.valid and entity_type ~= "locomotive" and entity_type ~= "cargo-wagon" and
+				entity_type ~= "fluid-wagon" and entity_type ~= "artillery-wagon"
+			then
+				if entity_type == "car" then
+					fx = entity.surface.create_entity{
 						name = "osp_repair-sticker",
-						position = tbl.entity.position,
-						target = tbl.entity
+						position = entity.position,
+						target = entity
 					}
 				else
-					tbl.fx = tbl.entity.surface.create_entity{name = "osp_repair_fx", position = tbl.entity.position}
+					fx = entity.surface.create_entity{name = "osp_repair_fx", position = entity.position}
 				end
 			end
-			tbl.entity.health = tbl.entity.health + tbl.entity.prototype.max_health / 4 / 10 + 5
-			if tbl.entity.get_health_ratio() == 1 then
-				if tbl.fx and tbl.fx.valid then
-					tbl.fx.destroy()
+			entity.health = entity.health + entity.prototype.max_health / 4 / 10 + 5
+			if entity.get_health_ratio() == 1 then
+				if fx and fx.valid then
+					fx.destroy()
 				end
 				global.repairing[unit_number] = nil
 			end
@@ -380,17 +385,19 @@ script.on_nth_tick(15, function(event)
 end)
 
 script.on_nth_tick(10, function(event)
+	local verify_inventories = global.verify_inventories
 	for _, player in pairs(game.connected_players) do
 		local inventory = player.get_main_inventory()
-		if inventory and global.verify_inventories[player.index] then
-			for spell, tick in pairs(global.verify_inventories[player.index]) do
+		local verify_inventory = verify_inventories[player.index]
+		if inventory and verify_inventory then
+			for spell_name, tick in pairs(verify_inventory) do
 				if tick + 121 > event.tick then
-					local stack = inventory.find_item_stack(spell)
+					local stack = inventory.find_item_stack(spell_name)
 					if not stack then
-						player.insert{name = spell, count = 1}
+						player.insert{name = spell_name}
 					end
 				else
-					global.verify_inventories[player.index][spell] = nil
+					verify_inventory[spell_name] = nil
 				end
 			end
 		end
@@ -400,14 +407,19 @@ end)
 script.on_nth_tick(30, function(event)
 	for _, player in pairs(game.connected_players) do
 		local inventory = player.get_main_inventory()
-		for spell_name, spell in pairs(spells) do
-			if not spell.ignore_cooldown then
-				global.players[player.index].cooldowns[spell_name] = max(0,
-								(global.players[player.index].cooldowns[spell_name] or 1) - 0.5)
-				if inventory and game.item_prototypes[spell_name] then
-					local stack = inventory.find_item_stack(spell_name)
-					if stack then
-						stack.count = max(1, floor(global.players[player.index].cooldowns[spell_name]))
+		if inventory then
+			for spell_name, spell in pairs(spells) do
+				local cooldowns = global.players[player.index].cooldowns
+				if not spell.ignore_cooldown then
+					cooldowns[spell_name] = max(
+						0,
+						(cooldowns[spell_name] or 1) - 0.5
+					)
+					if game.item_prototypes[spell_name] then
+						local stack = inventory.find_item_stack(spell_name)
+						if stack then
+							stack.count = max(1, floor(cooldowns[spell_name]))
+						end
 					end
 				end
 			end
@@ -415,7 +427,7 @@ script.on_nth_tick(30, function(event)
 	end
 end)
 
-script.on_nth_tick(1800, function(event)
+script.on_nth_tick(1800, function()
 	for _, player in pairs(game.connected_players) do
 		create_gui(player)
 	end
