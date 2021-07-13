@@ -102,7 +102,7 @@ fireball_explo.sound = {
 	aggregation = {max_count = 1, remove = true},
 	variations = {
 		{filename = "__base__/sound/fight/large-explosion-1.ogg", volume = 0.7},
-			{filename = "__base__/sound/fight/large-explosion-2.ogg", volume = 0.7}
+		{filename = "__base__/sound/fight/large-explosion-2.ogg", volume = 0.7}
 	}
 }
 local fireball_built = table.deepcopy(fireball_explo)

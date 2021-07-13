@@ -135,7 +135,7 @@ function update_mana(player)
 	player.gui.top.player_mana.spirit_flow.bar.values.caption = math.floor(spirit) .. "/" .. math.floor(max_spirit)
 end
 script.on_event({defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed}, function(event)
-	local player = game.players[event.player_index]
+	local player = game.get_player(event.player_index)
 	if not player.gui.top.player_mana then
 		return
 	end

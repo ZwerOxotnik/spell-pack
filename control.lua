@@ -99,7 +99,9 @@ end
 
 function register_conditional_event_handlers()
 	script.on_event("auto_research_toggle", function(event)
-		local player = game.players[event.player_index]
+		local player = game.get_player(event.player_index)
+		if not (player and player.valid) then return end
+
 		create_gui(player)
 	end)
 end
@@ -110,7 +112,8 @@ end)
 
 script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 	local player_index = event.player_index
-	local player = game.players[player_index]
+	local player = game.get_player(player_index)
+	if not (player and player.valid) then return end
 
 	local player_data = global.players[player_index]
 	if player_data.character_build_distance_bonus_old then
@@ -190,7 +193,10 @@ script.on_init(function()
 end)
 
 script.on_event(defines.events.on_player_joined_game, function(event)
-	create_gui(game.players[event.player_index])
+	local player = game.get_player(event.player_index)
+	if not (player and player.valid) then return end
+
+	create_gui(player)
 end)
 
 script.on_configuration_changed(function()
@@ -253,7 +259,9 @@ script.on_configuration_changed(function()
 end)
 script.on_event({defines.events.on_forces_merged, defines.events.on_player_changed_force}, function(event)
 	for _, player in pairs(game.players) do
-		verify_force(player)
+		if player and player.valid then
+			verify_force(player)
+		end
 	end
 end)
 
@@ -386,14 +394,6 @@ script.on_nth_tick(1800, function(event)
 	end
 end)
 
-local function table_length(tbl)
-	local i = 0
-	for _ in pairs(tbl) do
-		i = i + 1
-	end
-	return i
-end
-
 function dbg(str)
 	if str == nil then
 		str = "nil"
@@ -422,7 +422,7 @@ script.on_event({defines.events.on_built_entity}, function(event)
 	if spells[event.created_entity.name] and not spells[event.created_entity.name].trigger_created_entity then
 		-- if not spells[event.created_entity.name].trigger_created_entity then
 		local spell_name = event.created_entity.name
-		local player = game.players[event.player_index]
+		local player = game.get_player(event.player_index)
 		-- player.print( player.get_main_inventory().get_item_count(event.created_entity.name))
 		-- print("built" .. event.tick)
 		if --[[global.players[player.index].mana >= spells[spell_name].mana_cost and global.players[player.index].spirit >= spells[spell_name].spirit_cost and --]] (not global.verify_inventories[player.index] or
@@ -472,11 +472,12 @@ script.on_event({defines.events.on_built_entity}, function(event)
 		event.created_entity.destroy()
 	end
 end)
+
 script.on_event(defines.events.on_player_used_capsule, function(event)
 	if event.item and spells[event.item.name] and spells[event.item.name].trigger_created_entity then
 		-- if not spells[event.created_entity.name].trigger_created_entity then
 		local spell_name = event.item.name
-		local player = game.players[event.player_index]
+		local player = game.get_player(event.player_index)
 		-- player.print( player.get_main_inventory().get_item_count(event.created_entity.name))
 		-- print("grenade" .. event.tick)
 		if --[[global.players[player.index].mana >= spells[spell_name].mana_cost and global.players[player.index].spirit >= spells[spell_name].spirit_cost and --]] (not global.players[player.index]
@@ -525,15 +526,16 @@ script.on_event(defines.events.on_player_used_capsule, function(event)
 	end
 end)
 
-script.on_event(defines.events.script_raised_built, function()
+-- script.on_event(defines.events.script_raised_built, function()
 
-end)
+-- end)
 
 script.on_event(defines.events.on_post_entity_died, function(event)
 	if event.ghost then
 		table.insert(global.died_ghosts, event.ghost)
 	end
 end)
+
 script.on_event(defines.events.on_entity_died, function(event)
 	if remote.interfaces["dota_scenario_running"] or not event.entity.has_flag("breaths-air")
 		or event.entity.type == "tree"
@@ -562,12 +564,13 @@ script.on_event(defines.events.on_entity_died, function(event)
 			radius = 40
 		}
 		for _, character in pairs(characters) do
-			if character.player then
-				local force_data = global.forces[character.player.force.name]
-				local player_data = global.players[character.player.index]
-				global.players[character.player.index].spirit = math.min(
-								player_data.max_spirit + force_data.max_spirit,
-								player_data.spirit + player_data.spirit_per_kill + force_data.spirit_per_kill)
+			local player = character.player
+			if player then
+				local force_data = global.forces[player.force.name]
+				local player_data = global.players[player.index]
+				global.players[player.index].spirit = math.min(
+					player_data.max_spirit + force_data.max_spirit,
+					player_data.spirit + player_data.spirit_per_kill + force_data.spirit_per_kill)
 			end
 		end
 	end
@@ -579,36 +582,44 @@ end)
 
 script.on_event(defines.events.on_trigger_created_entity, function(event)
 	if not event.entity then return end
-	if spells[event.entity.name] and event.source and event.source.name == "character" and
-					spells[event.entity.name].trigger_created_entity then
-		local spell_name = event.entity.name
-		local player = event.source.player
-		local player_index = player.index
-		-- player.print( player.get_main_inventory().get_item_count(event.entity.name))
-		-- if global.players[player.index].mana >= spells[spell_name].mana_cost and global.players[player.index].spirit >= spells[spell_name].spirit_cost and player.get_main_inventory().get_item_count(spell_name) <1 and not player.cursor_stack.valid_for_read then -- mana check, cd check
-		local success = spells[spell_name].func(player, event.entity.position)
+	local entity = event.entity
 
+	local source = event.source
+	local spell_name = entity.name
+	if source then
+		if event.source.name ~= "character" then return end
+		local player = source.player
+		
+		local spell = spells[spell_name]
+		if not (spell and spell.trigger_created_entity) then return end
+		
+		local player_index = player.index
+		-- player.print( player.get_main_inventory().get_item_count(spell_name))
+		-- if global.players[player_index].mana >= spells[spell_name].mana_cost and global.players[player_index].spirit >= spells[spell_name].spirit_cost and player.get_main_inventory().get_item_count(spell_name) <1 and not player.cursor_stack.valid_for_read then -- mana check, cd check
+		
+		local success = spells[spell_name].func(player, entity.position)
 		if success then
-			local effect = global.players[player.index].bonus_effects[spell_name] or
-														 global.forces[player.force.name].bonus_effects[spell_name]
+			local effect = global.players[player_index].bonus_effects[spell_name] or
+				global.forces[player.force.name].bonus_effects[spell_name]
 			if effect then
-				global.bonus_effects[effect](player, event.entity.position)
+				global.bonus_effects[effect](player, entity.position)
 			end
 		end
-		-- end
-		-- event.entity.destroy()
-	end
-	if event.entity.name == "osp_absorb_explosion" then
-		local character = event.entity.surface.find_entity("character", event.entity.position) --TODO: check
+		return
+	elseif spell_name == "osp_absorb_explosion" then
+		local character = entity.surface.find_entity("character", entity.position) --TODO: check
 		if character and character.player then
 			local force_data = global.forces[character.player.force.name]
-			local player_data = global.players[character.player.index]
-			player_data.spirit = math.min(player_data.max_spirit + force_data.max_spirit,
-					player_data.spirit + player_data.spirit_per_kill + force_data.spirit_per_kill)
+			local player_data = global.players[character.player_index]
+			player_data.spirit = math.min(
+				player_data.max_spirit + force_data.max_spirit,
+				player_data.spirit + player_data.spirit_per_kill + force_data.spirit_per_kill
+			)
 		end
+		return
 	end
-
 end)
+
 function error(player, str)
 	player.surface.create_entity{
 		name = "flying-text",
