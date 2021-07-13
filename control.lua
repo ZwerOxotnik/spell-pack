@@ -291,11 +291,12 @@ script.on_event(defines.events.on_tick, function(event)
 		cursor_data[player_index] = nil
 	end
 
-	if global.on_tick[event.tick] then
-		for _, func in pairs(global.on_tick[event.tick]) do
+	local tick = event.tick
+	if global.on_tick[tick] then
+		for _, func in pairs(global.on_tick[tick]) do
 			func.func(func.vars)
 		end
-		global.on_tick[event.tick] = nil
+		global.on_tick[tick] = nil
 	end
 end)
 
