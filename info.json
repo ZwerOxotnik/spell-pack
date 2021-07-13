@@ -7,5 +7,5 @@
   "homepage": "",
   "factorio_version": "1.1",
   "dependencies": ["base"],
-  "description": ""
+  "description": "Adds spells, mana & spirit. (+10 fancy spells)\nAuthor: OwnlyMe\nModified by ZwerOxotnik"
 }
