@@ -272,27 +272,31 @@ function verify_force(player)
 end
 
 script.on_event(defines.events.on_tick, function(event)
-	for i, data in pairs(global.clean_cursor) do
+	local cursor_data = global.clean_cursor
+	for player_index, data in pairs(cursor_data) do
+		local player = game.get_player(player_index)
 		if type(data) == "table" then
+			local name = data.name
+			local count = data.count
 			if data.clean then
-				game.players[i].insert{name = data.name, count = data.count}
-				game.players[i].clear_cursor()
+				player.insert{name = name, count = count}
+				player.clear_cursor()
 			else
-				game.players[i].insert{name = data.name, count = data.count}
-				game.players[i].cursor_stack.set_stack{name = data.name, count = data.count}
+				player.insert{name = name, count = count}
+				player.cursor_stack.set_stack{name = name, count = count}
 			end
 		else
-			game.players[i].clear_cursor()
+			player.clear_cursor()
 		end
-		global.clean_cursor[i] = nil
+		cursor_data[player_index] = nil
 	end
+
 	if global.on_tick[event.tick] then
 		for _, func in pairs(global.on_tick[event.tick]) do
 			func.func(func.vars)
 		end
 		global.on_tick[event.tick] = nil
 	end
-
 end)
 
 script.on_nth_tick(15, function(event)
