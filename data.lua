@@ -69,7 +69,7 @@ dummy_explosion.collision_mask = {}
 dummy_explosion.animations =
     {
       {
-        filename = "__spell-pack__/graphics/transparent32.png",
+        filename = "__m-spell-pack__/graphics/transparent32.png",
         flags = { "compressed" },
         width = 32,
         height = 32,
@@ -93,7 +93,7 @@ for name, spell in pairs(spells) do
 		item.name = name
 		item.place_result=name
 		item.localised_name = spell.localised_name
-		item.icon = "__spell-pack__/graphics/icons/"..spell.icon
+		item.icon = "__m-spell-pack__/graphics/icons/"..spell.icon
 		item.icon_size = spell.icon_size
 		item.localised_description = spell.description.."\n"
 		if spell.order then
@@ -130,7 +130,7 @@ for name, spell in pairs(spells) do
 		grenade.name = name
 		grenade.place_result=name
 		grenade.localised_name = spell.localised_name
-		grenade.icon = "__spell-pack__/graphics/icons/"..spell.icon
+		grenade.icon = "__m-spell-pack__/graphics/icons/"..spell.icon
 		grenade.icon_size = spell.icon_size
 		grenade.localised_description = spell.description.."\n"
 		grenade.capsule_action.attack_parameters.range = spell.range
@@ -160,7 +160,7 @@ for name, spell in pairs(spells) do
 
 		local explosion = table.deepcopy(dummy_explosion)
 		explosion.name = name
-		explosion.animations[1].filename = "__spell-pack__/graphics/icons/"..spell.icon
+		explosion.animations[1].filename = "__m-spell-pack__/graphics/icons/"..spell.icon
 		explosion.animations[1].width = spell.icon_size
 		explosion.animations[1].height = spell.icon_size
 		explosion.animations[1].scale = 32/spell.icon_size
@@ -207,7 +207,7 @@ data:extend({
 		animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/flash.png",
+			filename = "__m-spell-pack__/graphics/flash.png",
 			line_length = 2,
 			width = 800,
 			height = 475,
@@ -243,7 +243,7 @@ data:extend({
 		animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/wrench.png",
+			filename = "__m-spell-pack__/graphics/wrench.png",
 			line_length = 5,
 			width = 100,
 			height = 111,
@@ -272,7 +272,7 @@ data:extend({
 	collision_mask = {},
     picture =
     {
-		filename = "__spell-pack__/graphics/radius_visualization.png",
+		filename = "__m-spell-pack__/graphics/radius_visualization.png",
 		priority = "extra-high",
 		width = 1024,
 		height = 1024,
@@ -290,7 +290,7 @@ data:extend({
     animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/wrench.png",
+			filename = "__m-spell-pack__/graphics/wrench.png",
 			line_length = 5,
 			width = 100,
 			height = 111,
@@ -314,7 +314,7 @@ data:extend({
     animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/Aura38.png",
+			filename = "__m-spell-pack__/graphics/Aura38.png",
 			line_length = 8,
 			width = 128,
 			height = 138,
@@ -338,7 +338,7 @@ data:extend({
     animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/gears.png",
+			filename = "__m-spell-pack__/graphics/gears.png",
 			line_length = 4,
 			width = 200,
 			height = 139,
@@ -356,7 +356,7 @@ data:extend({
   {
 		type = "smoke-with-trigger",
 		name = "osp_revive_fx",
-		icon = "__spell-pack__/graphics/revive.png",
+		icon = "__m-spell-pack__/graphics/revive.png",
 		icon_size = 32,
 		flags = {"not-repairable", "not-blueprintable", "not-deconstructable", "placeable-off-grid", "not-on-map", "placeable-neutral"},
 		order="b-b-g",
@@ -376,7 +376,7 @@ data:extend({
 		animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/revive.png",
+			filename = "__m-spell-pack__/graphics/revive.png",
 			line_length = 3,
 			width = 150,
 			height = 150,
@@ -422,7 +422,7 @@ data:extend({
     light = {intensity = 0.3, size = 3},
     animation =
     {
-      filename = "__spell-pack__/graphics/spirit.png",
+      filename = "__m-spell-pack__/graphics/spirit.png",
       frame_count = 91,
       line_length = 8,
       width = 45,
@@ -473,7 +473,7 @@ data:extend({
 	affected_by_wind = false,
     animation =
     {
-      filename = "__spell-pack__/graphics/smoke-fast.png",
+      filename = "__m-spell-pack__/graphics/smoke-fast.png",
       priority = "high",
       width = 50,
       height = 50,
@@ -493,7 +493,7 @@ data:extend({
     animations =
     {
       {
-        filename = "__spell-pack__/graphics/absorb.png",
+        filename = "__m-spell-pack__/graphics/absorb.png",
         priority = "high",
         width = 64,
         height = 64,
@@ -539,7 +539,7 @@ data:extend({
     animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/electricity.png",
+			filename = "__m-spell-pack__/graphics/electricity.png",
 			line_length = 6,
 			width = 125,
 			height = 125,
@@ -563,7 +563,7 @@ data:extend({
     animation =
 		{
 			variation_count = 0,
-			filename = "__spell-pack__/graphics/stopwatch.png",
+			filename = "__m-spell-pack__/graphics/stopwatch.png",
 			line_length = 9,
 			width = 55,
 			height = 60,

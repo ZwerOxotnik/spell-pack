@@ -29,7 +29,7 @@ fireball_grenade.capsule_action.attack_parameters.ammo_type.category = "grenade"
 fireball_grenade.capsule_action.attack_parameters.ammo_type.action[1].action_delivery.projectile = "fireball-projectile"
 fireball_grenade.stack_size = 500
 fireball_grenade.subgroup = "osp_spells"
-fireball_grenade.icon = "__spell-pack__/graphics/icons/red30.png"
+fireball_grenade.icon = "__m-spell-pack__/graphics/icons/red30.png"
 fireball_grenade.icon_size = 256
 --fireball_grenade.place_result="osp_fireball_built"
 fireball_grenade.capsule_action.attack_parameters.cooldown = 2
@@ -73,7 +73,7 @@ data:extend({{
 	affected_by_wind = false,
     animation =
     {
-      filename = "__spell-pack__/graphics/fire-smoke.png",
+      filename = "__m-spell-pack__/graphics/fire-smoke.png",
       priority = "high",
       width = 50,
       height = 50,
@@ -115,7 +115,7 @@ fireball_built.sound = nil
 fireball_built.created_effect=nil
 fireball_built.animations =
 				{{
-				filename = "__spell-pack__/graphics/radius_visualization.png",
+				filename = "__m-spell-pack__/graphics/radius_visualization.png",
 				priority = "extra-high",
 				width = 1024,
 				height = 1024,

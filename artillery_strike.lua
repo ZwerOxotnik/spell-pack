@@ -15,7 +15,7 @@ local ent_temp =  {
 	collision_mask = {},
     picture =
     {
-	filename = "__spell-pack__/graphics/osp_crosshair.png",
+	filename = "__m-spell-pack__/graphics/osp_crosshair.png",
 	priority = "extra-high",
 	width = 1050,
 	height = 1050,
@@ -187,7 +187,7 @@ local scorchmark ={
       frame_count = 1,
       direction_count = 1,
 	   x = 110 * 2,
-      filename = "__spell-pack__/graphics/small-scorchmark.png"
+      filename = "__m-spell-pack__/graphics/small-scorchmark.png"
     },
     ground_patch =
     {
@@ -197,7 +197,7 @@ local scorchmark ={
         height = 90,
         frame_count = 1,
         x = 110 * 2,
-        filename = "__spell-pack__/graphics/small-scorchmark.png",
+        filename = "__m-spell-pack__/graphics/small-scorchmark.png",
         variation_count = 3
       }
     },
@@ -209,7 +209,7 @@ local scorchmark ={
         height = 90,
         frame_count = 1,
         x = 110*2,
-        filename = "__spell-pack__/graphics/small-scorchmark.png",
+        filename = "__m-spell-pack__/graphics/small-scorchmark.png",
         variation_count = 3
       }
     }
@@ -229,7 +229,7 @@ data:extend({
 	--affected_by_wind = false,
     --animation =
     --{
-    --  filename = "__spell-pack__/graphics/smoke-fast.png",
+    --  filename = "__m-spell-pack__/graphics/smoke-fast.png",
     --  priority = "high",
     --  width = 50,
     --  height = 50,
