@@ -145,15 +145,15 @@ for name, spell in pairs(spells) do
 		end
 		--grenade.capsule_action.attack_parameters.ammo_category = "osp_fireball"
 		--grenade.capsule_action.attack_parameters.ammo_type.category = "osp_fireball"
-		grenade.capsule_action.attack_parameters.ammo_type.action.action_delivery.projectile = name.."-projectile"
-		
-		
+		grenade.capsule_action.attack_parameters.ammo_type.action[1].action_delivery.projectile = name.."-projectile"
+
+
 		local projectile = table.deepcopy(dummy_projectile)
 		projectile.name = name.."-projectile"
 		--projectile.animation = fireutil.create_fire_pictures({ blend_mode = "normal", animation_speed = 1, scale = 0.6})
 		projectile.action[1].action_delivery.target_effects[1].entity_name = name
 		projectile.action[1].action_delivery.target_effects[1].trigger_created_entity="true"
-		
+
 		local recipe = table.deepcopy(rec_temp)
 		recipe.name = name
 		recipe.result = name
@@ -178,11 +178,11 @@ for name, spell in pairs(spells) do
 			recipe,
 			explosion
 		})
-	
+
 	end
 end
 
-	
+
 data:extend({
 	{
 		type = "smoke-with-trigger",
@@ -504,7 +504,7 @@ data:extend({
 		tint = spirit_tint,
 		blend_mode = spirit_blend_mode
       },
-      
+
     },
     light = {intensity = 0.3, size = 5, color = {r=0.7, g=0.9, b=0.9}},
     --smoke = "smoke-fast",

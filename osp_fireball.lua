@@ -26,7 +26,7 @@ fireball_grenade.localised_description = "Ignites Targets (stacks)\nBonus damage
 fireball_grenade.capsule_action.attack_parameters.ammo_category = "grenade"
 --fireball_grenade.capsule_action.attack_parameters.ammo_type.category = "osp_fireball"
 fireball_grenade.capsule_action.attack_parameters.ammo_type.category = "grenade"
-fireball_grenade.capsule_action.attack_parameters.ammo_type.action.action_delivery.projectile = "fireball-projectile"
+fireball_grenade.capsule_action.attack_parameters.ammo_type.action[1].action_delivery.projectile = "fireball-projectile"
 fireball_grenade.stack_size = 500
 fireball_grenade.subgroup = "osp_spells"
 fireball_grenade.icon = "__spell-pack__/graphics/icons/red30.png"
@@ -66,7 +66,7 @@ fireball_projectile. smoke =
         starting_frame_speed_deviation = 5
       }
     }
-  
+
 data:extend({{
     type = "trivial-smoke",
     name = "osp_fireball_smoke",
@@ -132,7 +132,7 @@ local fireball_recipe = {
     result = "osp_fireball_built",
 	enabled = true
   }
-	
+
 data:extend({
 --fireball_cat,
 fireball_grenade,

@@ -4,13 +4,13 @@ require "SPELLS"
 
 	remote.add_interface("spell-pack", {
 		get = function(field) return global[field] end,
-		set = function(field, value) 
-			if global[field] then 
-				global[field] = value 
+		set = function(field, value)
+			if global[field] then
+				global[field] = value
 				return true
-			else 
-				return false 
-			end 
+			else
+				return false
+			end
 		end,
 		modplayer = function(player,field,value)
 			if not global.players[player.index][field] then
@@ -60,7 +60,7 @@ require "SPELLS"
 			local max_mana = global.players[player.index].max_mana + global.forces[player.force.name].max_mana
 			local spirit = global.players[player.index].spirit
 			local max_spirit = global.players[player.index].max_spirit + global.forces[player.force.name].max_spirit
-			return{ 
+			return{
 				mana = mana,
 				max_mana = max_mana,
 				spirit = spirit,
@@ -82,7 +82,7 @@ require "SPELLS"
 			return global.enabledbars
 		end
 	  })
-	 
+
 function max_range(pos1,pos2,range)
 	local distance = distance(pos1,pos2)
 	pos2.x = pos2.x-pos1.x
@@ -107,7 +107,7 @@ end)
 
 script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 	local player = game.players[event.player_index]
-	
+
 	if global.players[event.player_index].character_build_distance_bonus_old then
 		player.force.character_build_distance_bonus = math.max(0, global.players[event.player_index].character_build_distance_bonus_old + (player.force.character_build_distance_bonus-global.players[event.player_index].character_build_distance_bonus_new))
 		global.players[event.player_index].character_build_distance_bonus_old = nil
@@ -117,13 +117,13 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 	if spells[player.cursor_stack.name] then
 		local spell_name = player.cursor_stack.name
 		if (global.players[player.index].cooldowns[spell_name] and global.players[player.index].cooldowns[spell_name] > 0) then
-			player.clean_cursor()
+			player.clear_cursor()
 			error(player,"On cooldown...")
 		elseif global.players[event.player_index].mana < spells[spell_name].mana_cost then
-			player.clean_cursor()
+			player.clear_cursor()
 			error(player,"No mana...")
 		elseif global.players[event.player_index].spirit < spells[spell_name].spirit_cost then
-			player.clean_cursor()
+			player.clear_cursor()
 			error(player,"No Spirit...")
 		elseif spells[spell_name].no_target then
 			local success = spells[spell_name].func(player)
@@ -148,8 +148,8 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 			else
 				global.clean_cursor[event.player_index] = {name=spell_name, count = 1, clean = true}
 			end
-		elseif not global.players[event.player_index].character_build_distance_bonus_old then 
-			global.players[event.player_index].character_build_distance_bonus_old = player.force.character_build_distance_bonus 
+		elseif not global.players[event.player_index].character_build_distance_bonus_old then
+			global.players[event.player_index].character_build_distance_bonus_old = player.force.character_build_distance_bonus
 			global.players[event.player_index].character_build_distance_bonus_new = global.players[event.player_index].character_build_distance_bonus_old+10000
 			player.force.character_build_distance_bonus = global.players[event.player_index].character_build_distance_bonus_new
 		end
@@ -182,7 +182,7 @@ end)
 
 script.on_configuration_changed(function()
 	if not global.version then
-	
+
 		for _, player in pairs(game.players) do
 			if player.gui.top.player_mana then player.gui.top.player_mana.destroy() end
 			global.players[player.index] =nil
@@ -207,7 +207,7 @@ script.on_configuration_changed(function()
 	end
 	if global.game_version == 16 then
 		for _, player in pairs(game.players) do
-			if player.gui.top.player_mana_spacer then 
+			if player.gui.top.player_mana_spacer then
 				player.gui.top.player_mana_spacer.destroy()
 			end
 		end
@@ -253,13 +253,13 @@ script.on_event(defines.events.on_tick, function(event)
 		if type(data) == "table" then
 			if data.clean then
 				game.players[i].insert{name = data.name, count = data.count}
-				game.players[i].clean_cursor()
+				game.players[i].clear_cursor()
 			else
 				game.players[i].insert{name = data.name, count = data.count}
 				game.players[i].cursor_stack.set_stack{name = data.name, count = data.count}
 			end
 		else
-			game.players[i].clean_cursor()
+			game.players[i].clear_cursor()
 		end
 		global.clean_cursor[i] = nil
 	end
@@ -269,7 +269,7 @@ script.on_event(defines.events.on_tick, function(event)
 		end
 		global.on_tick[event.tick]=nil
 	end
-	
+
 end)
 
 script.on_nth_tick(15, function(event)
@@ -362,7 +362,7 @@ function dbg(str)
 			if str == true then
 				str = "true"
 			else
-				str = "false" 
+				str = "false"
 			end
 		else
 			str=type(str)
@@ -411,7 +411,7 @@ script.on_event({defines.events.on_built_entity}, function(event)
 					update_mana(player)
 					global.players[player.index].cooldowns[spell_name] = cd
 					global.clean_cursor[event.player_index] = {name=spell_name, count = math.max(1,math.floor(cd)), clean = true}
-					player.clean_cursor()
+					player.clear_cursor()
 					if not global.verify_inventories[player.index] then
 						global.verify_inventories[player.index] ={}
 					end
@@ -457,7 +457,7 @@ script.on_event(defines.events.on_player_used_capsule, function(event)
 					update_mana(player)
 					global.players[player.index].cooldowns[spell_name] = cd
 					global.clean_cursor[event.player_index] = {name=spell_name, count = math.max(1,math.floor(cd)), clean = true}
-					player.clean_cursor()
+					player.clear_cursor()
 					if not global.verify_inventories[player.index] then
 						global.verify_inventories[player.index] ={}
 					end
@@ -512,7 +512,7 @@ script.on_event(defines.events.on_trigger_created_entity, function(event)
 		--player.print( player.get_main_inventory().get_item_count(event.entity.name))
 		--if global.players[player.index].mana >= spells[spell_name].mana_cost and global.players[player.index].spirit >= spells[spell_name].spirit_cost and player.get_main_inventory().get_item_count(spell_name) <1 and not player.cursor_stack.valid_for_read then -- mana check, cd check
 			local success = spells[spell_name].func(player,event.entity.position)
-			
+
 			if success then
 				local effect = global.players[player.index].bonus_effects[spell_name] or global.forces[player.force.name].bonus_effects[spell_name]
 				if effect then
@@ -528,7 +528,7 @@ script.on_event(defines.events.on_trigger_created_entity, function(event)
 			global.players[character.player.index].spirit = math.min(global.players[character.player.index].max_spirit+global.forces[character.player.force.name].max_spirit,global.players[character.player.index].spirit + global.players[character.player.index].spirit_per_kill+global.forces[character.player.force.name].spirit_per_kill)
 		end
 	end
-		
+
 end)
 function error(player,str)
 	player.surface.create_entity{name="flying-text",position=player.position, text=str, render_player_index = player.index}
