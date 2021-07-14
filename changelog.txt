@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.19.5
+Date: 2021-07-14
+  Features:
+    - Added settings for spells (you can customize spells now)
+  Changes:
+    - Improved access to localization (it's possible to translate some spells now)
+  Notes:
+    - Updated by ZwerOxotnik
+    - Refactored some code
+    - I'll add more settings later
+---------------------------------------------------------------------------------------------------
 Version: 0.19.4
 Date: 2021-07-14
   Bugfixes:

@@ -1,22 +1,28 @@
-function random_point_radius(position, distance)
-	local radius = distance
-	local pt_angle = math.random() * 2 * math.pi
-	local pt_radius_sq = math.random() * radius * radius
-	local pt_x = math.sqrt(pt_radius_sq) * math.cos(pt_angle)
-	local pt_y = math.sqrt(pt_radius_sq) * math.sin(pt_angle)
+local random = math.random
+local sqrt = math.sqrt
+local cos = math.cos
+local sin = math.sin
+local min = math.min
+local max = math.max
+local floor = math.floor
+local pi2 = math.pi * 2
+
+
+local function random_point_radius(position, radius)
+	local pt_angle = random() * pi2
+	local pt_radius_sq = random() * radius * radius
+	local pt_x = sqrt(pt_radius_sq) * cos(pt_angle)
+	local pt_y = sqrt(pt_radius_sq) * sin(pt_angle)
 	return {x = pt_x + position.x, y = pt_y + position.y}
 end
 
 spells = {
 	["osp_blink"] = {
 		name = "osp_blink",
-		localised_name = "Blink",
-		description = "Teleports you over a distance of 50",
 		icon = "blink.png",
-		icon_size = 256,
-		cooldown = 300,
-		mana_cost = 10,
-		spirit_cost = 0,
+		cooldown = settings.startup.osp_blink_cooldown.value,
+		mana_cost = settings.startup.osp_blink_mana_cost.value,
+		spirit_cost = settings.startup.osp_blink_spirit_cost.value,
 		dummy = "grenade",
 		range = 50,
 		func = function(player, position)
@@ -35,23 +41,21 @@ spells = {
 	},
 	["osp_sprint"] = {
 		name = "osp_sprint",
-		localised_name = "Blazing Fast",
-		description = "Increases your Movement speed by 30% for 3 seconds (or accelerates your vehicle) and ignites the ground.",
 		icon = "b_30.png",
-		icon_size = 256,
-		cooldown = 0,
-		mana_cost = 15,
-		spirit_cost = 0,
+		cooldown = settings.startup.osp_sprint_cooldown.value,
+		mana_cost = settings.startup.osp_sprint_mana_cost.value,
+		spirit_cost = settings.startup.osp_sprint_spirit_cost.value,
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
-			local level = math.min(25, math.max(0, math.floor(player.force.get_ammo_damage_modifier("flamethrower") * 5)))
-			if not global.friendly_fire[player.force.name] then
-				global.friendly_fire[player.force.name] = {friendly_fire = player.force.friendly_fire}
-			elseif global.friendly_fire[player.force.name].tick <= game.tick then
-				global.friendly_fire[player.force.name].friendly_fire = player.force.friendly_fire
+			local force = player.force
+			local level = min(25, max(0, floor(force.get_ammo_damage_modifier("flamethrower") * 5)))
+			if not global.friendly_fire[force.name] then
+				global.friendly_fire[force.name] = {friendly_fire = force.friendly_fire}
+			elseif global.friendly_fire[force.name].tick <= game.tick then
+				global.friendly_fire[force.name].friendly_fire = force.friendly_fire
 			end
-			player.force.friendly_fire = false
+			force.friendly_fire = false
 			if player.vehicle then
 				local vehicle = player.vehicle
 				if not vehicle.prototype.max_energy_usage or vehicle.prototype.max_energy_usage == 0 then
@@ -64,22 +68,23 @@ spells = {
 					end
 					table.insert(global.on_tick[game.tick + i], {
 						func = function(vars)
-							if vars.vehicle and vars.vehicle.valid then
+							local vehicle_ent = vars.vehicle
+							if vehicle_ent and vehicle_ent.valid then
 								local accel = 0
-								if vars.vehicle.train then
-									accel = vars.vehicle.prototype.max_energy_usage * 0.28 / vars.vehicle.train.weight / 100
-									if vars.vehicle.train.speed >= 0 then
-										vars.vehicle.train.speed = vars.vehicle.train.speed + accel
+								local train = vehicle_ent.train
+								if train then
+									accel = vehicle_ent.prototype.max_energy_usage * 0.28 / train.weight / 100
+									if train.speed >= 0 then
+										train.speed = train.speed + accel
 									else
-										vars.vehicle.train.speed = vars.vehicle.train.speed - accel
+										train.speed = train.speed - accel
 									end
-
 								else
-									accel = vars.vehicle.prototype.max_energy_usage * 0.28 / vars.vehicle.prototype.weight / 100
-									if vars.vehicle.speed >= 0 then
-										vars.vehicle.speed = vars.vehicle.speed + accel
+									accel = vehicle_ent.prototype.max_energy_usage * 0.28 / vehicle_ent.prototype.weight / 100
+									if vehicle_ent.speed >= 0 then
+										vehicle_ent.speed = vehicle_ent.speed + accel
 									else
-										vars.vehicle.speed = vars.vehicle.speed - accel
+										vehicle_ent.speed = vehicle_ent.speed - accel
 									end
 								end
 							end
@@ -105,8 +110,8 @@ spells = {
 									target = pos
 								}
 								local pos2 = {}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
 								vars.player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
 									position = vars.player.position,
@@ -115,8 +120,8 @@ spells = {
 									source = pos2,
 									target = pos2
 								}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
 								vars.player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
 									position = vars.player.position,
@@ -125,8 +130,8 @@ spells = {
 									source = pos2,
 									target = pos2
 								}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
 								vars.player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
 									position = vars.player.position,
@@ -141,7 +146,7 @@ spells = {
 					})
 				end
 
-				global.friendly_fire[player.force.name].tick = math.max(global.friendly_fire[player.force.name].tick or 1,
+				global.friendly_fire[force.name].tick = max(global.friendly_fire[force.name].tick or 1,
 								game.tick + 241)
 				if not global.on_tick[game.tick + 241] then
 					global.on_tick[game.tick + 241] = {}
@@ -152,13 +157,14 @@ spells = {
 							vars.force.friendly_fire = global.friendly_fire[vars.force.name].friendly_fire
 						end
 					end,
-					vars = {force = player.force}
+					vars = {force = force}
 				})
 			else
-				if player.character and player.character.valid then
+				local character = player.character
+				if character and character.valid then
 					local free_stickers = {true, true, true, true, true}
-					if player.character.stickers then
-						for _, sticker in pairs(player.character.stickers) do
+					if character.stickers then
+						for _, sticker in pairs(character.stickers) do
 							if sticker.name:sub(1, 16) == "spellpack-speed-" then
 								free_stickers[tonumber(sticker.name:sub(17))] = false
 							end
@@ -166,20 +172,20 @@ spells = {
 					end
 					for i, b in pairs(free_stickers) do
 						if b then
-							player.character.surface.create_entity{
+							character.surface.create_entity{
 								name = "spellpack-speed-" .. i,
-								position = player.character.position,
-								target = player.character
+								position = character.position,
+								target = character
 							}
 							break
 						end
 					end
 				end
 				-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
-				-- player.force.character_running_speed_modifier = player.force.character_running_speed_modifier + 1
+				-- force.character_running_speed_modifier = force.character_running_speed_modifier + 1
 				-- if not global.on_tick[game.tick + 180] then global.on_tick[game.tick + 180] = {} end
 				-- table.insert(global.on_tick[game.tick + 180], {func = function (vars)
-				--	vars.player.force.character_running_speed_modifier  = math.max(0,vars.player.force.character_running_speed_modifier - 1)
+				--	vars.force.character_running_speed_modifier  = max(0,vars.force.character_running_speed_modifier - 1)
 				-- end,vars = {player = player}})
 
 				for i = 1, 180 do
@@ -188,44 +194,45 @@ spells = {
 					end
 					table.insert(global.on_tick[game.tick + i * 1], {
 						func = function(vars)
-							if vars.player.character and vars.player.character.valid then
-								local pos = vars.player.position
-								vars.player.surface.create_entity{
+							local _player = vars.player
+							if _player.character and _player.character.valid then
+								local pos = _player.position
+								_player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
+									position = _player.position,
 									force = "player",
-									player = vars.player,
+									player = _player,
 									source = pos,
 									target = pos
 								}
 								local pos2 = {}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
-								vars.player.surface.create_entity{
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
+								_player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
+									position = _player.position,
 									force = "player",
-									player = vars.player,
+									player = _player,
 									source = pos2,
 									target = pos2
 								}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
-								vars.player.surface.create_entity{
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
+								_player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
+									position = _player.position,
 									force = "player",
-									player = vars.player,
+									player = _player,
 									source = pos2,
 									target = pos2
 								}
-								pos2.x = pos.x - 0.25 + math.random() / 2
-								pos2.y = pos.y - 0.25 + math.random() / 2
-								vars.player.surface.create_entity{
+								pos2.x = pos.x - 0.25 + random() / 2
+								pos2.y = pos.y - 0.25 + random() / 2
+								_player.surface.create_entity{
 									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
+									position = _player.position,
 									force = "player",
-									player = vars.player,
+									player = _player,
 									source = pos2,
 									target = pos2
 								}
@@ -234,18 +241,21 @@ spells = {
 						vars = {player = player, level = level}
 					})
 				end
-				global.friendly_fire[player.force.name].tick = math.max(global.friendly_fire[player.force.name].tick or 1,
-								game.tick + 361)
-				if not global.on_tick[game.tick + 361] then
-					global.on_tick[game.tick + 361] = {}
+				local tick = game.tick + 361
+				global.friendly_fire[force.name].tick = max(
+					global.friendly_fire[force.name].tick or 1,
+					tick
+				)
+				if not global.on_tick[tick] then
+					global.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[game.tick + 361], {
+				table.insert(global.on_tick[tick], {
 					func = function(vars)
 						if game.tick == global.friendly_fire[vars.force.name].tick then
 							vars.force.friendly_fire = global.friendly_fire[vars.force.name].friendly_fire
 						end
 					end,
-					vars = {force = player.force}
+					vars = {force = force}
 				})
 			end
 			return true
@@ -253,16 +263,13 @@ spells = {
 	},
 	["osp_rebuild"] = {
 		name = "osp_rebuild",
-		localised_name = "Rebuild",
-		description = "Revives(!) ghosts in an area of 8\nMay cause issues with mods that don't listen for the script_raised_revive event",
 		icon = "g_29.png",
-		icon_size = 256,
-		cooldown = 1,
-		mana_cost = 0,
-		spirit_cost = 50,
+		cooldown = settings.startup.osp_rebuild_cooldown.value,
+		mana_cost = settings.startup.osp_rebuild_mana_cost.value,
+		spirit_cost = settings.startup.osp_rebuild_spirit_cost.value,
 		dummy = "grenade",
 		range = 50,
-		light = {intensity = 1, size = 24 + 2, color = {r = 1.0, g = 1.0, b = 1.0}}, -- additional aoe visualization at night ~3x radius+2
+		light = {intensity = 1, size = 26, color = {r = 1.0, g = 1.0, b = 1.0}}, -- additional aoe visualization at night ~3x radius+2
 		no_target = false,
 		func = function(player, position)
 			if distance(player.position, position) < 50 then
@@ -299,13 +306,10 @@ spells = {
 	},
 	["osp_recharge"] = {
 		name = "osp_recharge",
-		localised_name = "Recharge",
-		description = "Over the next 10 seconds, charges your batteries or the batteries of your vehicle by 40MJ",
 		icon = "g_27.png",
-		icon_size = 256,
-		cooldown = 1,
-		mana_cost = 50,
-		spirit_cost = 0,
+		cooldown = settings.startup.osp_recharge_cooldown.value,
+		mana_cost = settings.startup.osp_recharge_mana_cost.value,
+		spirit_cost = settings.startup.osp_recharge_spirit_cost.value,
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
@@ -343,7 +347,7 @@ spells = {
 								local temp_batteries = 0
 								for _, eq in pairs(vars.target_entity.grid.equipment) do
 									if eq.type == "battery-equipment" and eq.energy < eq.max_energy then
-										local charging = math.min(remaining_electricity / batteries, eq.max_energy - eq.energy)
+										local charging = min(remaining_electricity / batteries, eq.max_energy - eq.energy)
 										eq.energy = eq.energy + charging
 										used_electricity = used_electricity + charging
 										if eq.energy < eq.max_energy then
@@ -365,13 +369,10 @@ spells = {
 	},
 	["osp_crafting"] = {
 		name = "osp_crafting",
-		localised_name = "Pocket-Factory",
-		description = "Increases your crafting speed by 10x for 5 seconds",
 		icon = "gr_03.png",
-		icon_size = 256,
-		cooldown = 1,
-		mana_cost = 20,
-		spirit_cost = 0,
+		cooldown = settings.startup.osp_crafting_cooldown.value,
+		mana_cost = settings.startup.osp_crafting_mana_cost.value,
+		spirit_cost = settings.startup.osp_crafting_spirit_cost.value,
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
@@ -386,7 +387,7 @@ spells = {
 			end
 			table.insert(global.on_tick[game.tick + 300], {
 				func = function(vars)
-					vars.player.force.manual_crafting_speed_modifier = math.max(0, vars.old_speed +
+					vars.player.force.manual_crafting_speed_modifier = max(0, vars.old_speed +
 									vars.player.force.manual_crafting_speed_modifier - vars.new_speed)
 				end,
 				vars = vars
@@ -396,13 +397,10 @@ spells = {
 	},
 	["osp_teleport"] = {
 		name = "osp_teleport",
-		localised_name = "Teleport",
-		description = "After 7 seconds, teleports you to a friendly building",
 		icon = "b_02.png",
-		icon_size = 256,
-		cooldown = 300,
-		mana_cost = 10,
-		spirit_cost = 0,
+		cooldown = settings.startup.osp_teleport_cooldown.value,
+		mana_cost = settings.startup.osp_teleport_mana_cost.value,
+		spirit_cost = settings.startup.osp_teleport_spirit_cost.value,
 		dummy = "building",
 		func = function(player, position)
 			-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
@@ -410,11 +408,12 @@ spells = {
 			local closest_distance = 999
 			local closest_building = nil
 			for _, building in pairs(buildings) do
-				if building.valid and not building.has_flag("breaths-air") and
-								(player.force.get_friend(building.force) or player.force == building.force) and building.name ~= "osp_teleport" then
+				if building.valid and not building.has_flag("breaths-air")
+					and (player.force.get_friend(building.force) or player.force == building.force) and building.name ~= "osp_teleport"
+				then
 					local dist = distance(building.position, position)
 					if dist < closest_distance then
-						closest_building = building
+						closest_building = building -- ?
 						closest_distance = dist
 					end
 				end
@@ -479,7 +478,7 @@ spells = {
 		ignore_cooldown = true,
 		func = function(player, position)
 			local entities = player.surface.find_entities_filtered{position = position, radius = 4.5}
-			local level = math.min(20, math.max(0, math.floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
+			local level = min(20, max(0, floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
 			for _, ent in pairs(entities) do
 				if ent.valid and ent.health and ent.health > 0 and (ent.type == "unit" or ent.type == "character") then
 					local sticker_lvl = nil
@@ -492,7 +491,7 @@ spells = {
 						end
 					end
 					ent.surface.create_entity{
-						name = "osp_fireball-sticker-" .. math.min(25, (sticker_lvl or level) + 1),
+						name = "osp_fireball-sticker-" .. min(25, (sticker_lvl or level) + 1),
 						position = ent.position,
 						target = ent
 					}
@@ -531,7 +530,7 @@ spells = {
 		ignore_cooldown = true,
 		func = function(player, position)
 			local entities = player.surface.find_entities_filtered{position = position, radius = 3.5}
-			local level = math.min(20, math.max(0, math.floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
+			local level = min(20, max(0, floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
 			for _, ent in pairs(entities) do
 				if ent.valid and ent.health and ent.health > 0 and (ent.type == "unit" or ent.type == "character") then
 					local sticker_lvl = nil
@@ -544,7 +543,7 @@ spells = {
 						end
 					end
 					ent.surface.create_entity{
-						name = "osp_fireball-sticker-" .. math.max(0, (sticker_lvl or level) - 1),
+						name = "osp_fireball-sticker-" .. max(0, (sticker_lvl or level) - 1),
 						position = ent.position,
 						target = ent
 					}
@@ -560,28 +559,24 @@ spells = {
 	},
 	["osp_timewarp"] = {
 		name = "osp_timewarp",
-		localised_name = "Timewarp",
-		description = "Slows down time for 10 seconds, while retaining your movement- and attackspeed",
 		icon = "b_31.png",
-		icon_size = 256,
-		cooldown = 120,
-		mana_cost = 30,
-		spirit_cost = 30,
+		cooldown = settings.startup.osp_timewarp_cooldown.value,
+		mana_cost = settings.startup.osp_timewarp_mana_cost.value,
+		spirit_cost = settings.startup.osp_timewarp_spirit_cost.value,
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
+			local force = player.force
 			-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
 			player.surface.create_entity{name = "osp_stopwatch-sticker", position = player.position, target = player.character}
-			local running_speed_modifier = player.force.character_running_speed_modifier +
-							                               player.character_running_speed_modifier + 1
-			player.force.character_running_speed_modifier = player.force.character_running_speed_modifier +
-							                                                running_speed_modifier
+			local running_speed_modifier = force.character_running_speed_modifier + player.character_running_speed_modifier + 1
+			force.character_running_speed_modifier = force.character_running_speed_modifier + running_speed_modifier
 			local old_game_speed = game.speed
 			game.speed = 0.5
 			local attackspeeds = {}
 			for a in pairs(game.ammo_category_prototypes) do
-				attackspeeds[a] = player.force.get_gun_speed_modifier(a) + 1
-				player.force.set_gun_speed_modifier(a, player.force.get_gun_speed_modifier(a) + attackspeeds[a])
+				attackspeeds[a] = force.get_gun_speed_modifier(a) + 1
+				force.set_gun_speed_modifier(a, force.get_gun_speed_modifier(a) + attackspeeds[a])
 			end
 			local vars = {
 				player = player,
@@ -594,11 +589,14 @@ spells = {
 			end
 			table.insert(global.on_tick[game.tick + 300], {
 				func = function(vars)
-					vars.player.force.character_running_speed_modifier = math.max(0,
-									vars.player.force.character_running_speed_modifier - vars.running_speed_modifier)
+					local _force = vars.player.force
+					_force.character_running_speed_modifier = max(
+						0,
+						_force.character_running_speed_modifier - vars.running_speed_modifier
+					)
 					game.speed = vars.old_game_speed
 					for a, b in pairs(vars.attackspeeds) do
-						vars.player.force.set_gun_speed_modifier(a, math.max(0, vars.player.force.get_gun_speed_modifier(a) - b))
+						_force.set_gun_speed_modifier(a, max(0, _force.get_gun_speed_modifier(a) - b))
 					end
 				end,
 				vars = vars
@@ -616,65 +614,70 @@ spells = {
 	},
 	["osp_repair"] = {
 		name = "osp_repair",
-		localised_name = "Repair",
-		description = "Repairs surrounding entities for 10 seconds",
 		icon = "b_07.png",
-		icon_size = 256,
-		cooldown = 10,
-		mana_cost = 30,
-		spirit_cost = 5,
+		cooldown = settings.startup.osp_repair_cooldown.value,
+		mana_cost = settings.startup.osp_repair_mana_cost.value,
+		spirit_cost = settings.startup.osp_repair_spirit_cost.value,
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
 			local vars = {player = player}
+			local tick
 			for i = 1, 600 do
-				if not global.on_tick[game.tick + i] then
-					global.on_tick[game.tick + i] = {}
+				tick = game.tick + i
+				if not global.on_tick[tick] then
+					global.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[game.tick + i], {
+				table.insert(global.on_tick[tick], {
 					func = function(vars)
-						if vars.player.character and vars.player.character.valid then
-							if global.players[vars.player.index].repair_radius and global.players[vars.player.index].repair_radius.valid then
-								global.players[vars.player.index].repair_radius.destroy()
+						local _player = vars.player
+						local character = vars.character
+						local player_index = _player.index
+						local player_data = global.players[player_index]
+						local entity = player_data.repair_radius
+						if character and character.valid then
+							if entity and entity.valid then
+								entity.destroy()
 							end
-							global.players[vars.player.index].repair_radius = vars.player.surface.create_entity{
+							player_data.repair_radius = _player.surface.create_entity{
 								name = "osp_repair_radius",
-								position = vars.player.position
+								position = _player.position
 							}
-							global.players[vars.player.index].repair_radius.render_player = vars.player
-							local surroundings = vars.player.surface.find_entities_filtered{position = vars.player.position, radius = 16}
-							for _, entity in pairs(surroundings) do
-								if entity.valid and entity.health and entity.health > 0 and entity.unit_number and
-												not entity.has_flag("breaths-air") and not entity.has_flag("not-repairable") and entity.get_health_ratio() <
-												1 then
-									if global.repairing[entity.unit_number] then
-										global.repairing[entity.unit_number].tick = game.tick
+							player_data.repair_radius.render_player = _player
+							local surroundings = _player.surface.find_entities_filtered{position = _player.position, radius = 16}
+							for _, _entity in pairs(surroundings) do
+								if _entity.valid and _entity.health and _entity.health > 0 and _entity.unit_number and
+									not _entity.has_flag("breaths-air") and not _entity.has_flag("not-repairable")
+									and _entity.get_health_ratio() < 1
+								then
+									if global.repairing[_entity.unit_number] then
+										global.repairing[_entity.unit_number].tick = game.tick
 									else
-										if entity.type == "locomotive" or entity.type == "cargo-wagon" or entity.type == "fluid-wagon" or entity.type ==
-														"artillery-wagon" then
-											global.repairing[entity.unit_number] = {entity = entity, tick = game.tick, fx = nil}
-										elseif entity.type == "car" then
-											global.repairing[entity.unit_number] = {
-												entity = entity,
+										if _entity.type == "locomotive" or _entity.type == "cargo-wagon"
+											or _entity.type == "fluid-wagon" or _entity.type == "artillery-wagon"
+										then
+											global.repairing[_entity.unit_number] = {entity = _entity, tick = game.tick, fx = nil}
+										elseif _entity.type == "car" then
+											global.repairing[_entity.unit_number] = {
+												entity = _entity,
 												tick = game.tick,
-												fx = entity.surface.create_entity{name = "osp_repair-sticker", position = entity.position, target = entity}
+												fx = _entity.surface.create_entity{name = "osp_repair-sticker", position = _entity.position, target = _entity}
 											}
 										else
-											global.repairing[entity.unit_number] = {
-												entity = entity,
+											global.repairing[_entity.unit_number] = {
+												entity = _entity,
 												tick = game.tick,
-												fx = entity.surface.create_entity{name = "osp_repair_fx", position = entity.position}
+												fx = _entity.surface.create_entity{name = "osp_repair_fx", position = _entity.position}
 											}
 										end
 									end
 
 								end
 							end
-						elseif global.players[vars.player.index].repair_radius and global.players[vars.player.index].repair_radius.valid then
-							global.players[vars.player.index].repair_radius.destroy()
-							global.players[vars.player.index].repair_radius = nil
+						elseif entity and entity.valid then
+							entity.destroy()
+							player_data.repair_radius = nil
 						end
-
 					end,
 					vars = vars
 				})
@@ -684,9 +687,12 @@ spells = {
 			end
 			table.insert(global.on_tick[game.tick + 601], {
 				func = function(vars)
-					if global.players[vars.player.index].repair_radius and global.players[vars.player.index].repair_radius.valid then
-						global.players[vars.player.index].repair_radius.destroy()
-						global.players[vars.player.index].repair_radius = nil
+					local player_index = vars.player.index
+					local player_data = global.players[player_index]
+					local entity = global.players[player_index].repair_radius
+					if entity and entity.valid then
+						entity.destroy()
+						player_data.repair_radius = nil
 					end
 				end,
 				vars = vars
@@ -696,13 +702,10 @@ spells = {
 	},
 	["osp_artillery"] = {
 		name = "osp_artillery",
-		localised_name = "Artillery Strike",
-		description = "Fires 16 projectiles (x50 dmg) at the selected area\nTriple bonus damage from grenade modifiers",
 		icon = "p_15.png",
-		icon_size = 256,
-		cooldown = 0,
-		mana_cost = 30,
-		spirit_cost = 30,
+		cooldown = settings.startup.osp_artillery_cooldown.value,
+		mana_cost = settings.startup.osp_artillery_mana_cost.value,
+		spirit_cost = settings.startup.osp_artillery_spirit_cost.value,
 		dummy = "building",
 		order = "2",
 		-- range = 50,
@@ -714,14 +717,14 @@ spells = {
 			local crosshair = player.surface.create_entity{name = "osp_artillery_crosshair", position = position}
 			crosshair.destructible = false
 			local surface = player.surface
-			local level = math.min(20, math.max(0, math.floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
+			local level = min(20, max(0, floor(player.force.get_ammo_damage_modifier("grenade") * 5)))
 			local vars = {level = level, position = position, player = player, surface = surface, crosshair = crosshair}
 			for i = 1, 16 do
-				local j = math.floor(math.random() * 4 + 4) * i + 60
-				if not global.on_tick[game.tick + j] then
-					global.on_tick[game.tick + j] = {}
+				local tick = game.tick + floor(random() * 4 + 4) * i + 60
+				if not global.on_tick[tick] then -- TODO: check
+					global.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[game.tick + j], {
+				table.insert(global.on_tick[tick], {
 					func = function(vars)
 						local pos = random_point_radius(vars.position, 7)
 						local spawnpos = {pos.x - 3, pos.y - 30}
@@ -737,24 +740,26 @@ spells = {
 				})
 			end
 			for i = 1, 19 do
-				local j = 10 * i
-				if not global.on_tick[game.tick + j] then
-					global.on_tick[game.tick + j] = {}
+				local tick = game.tick + 10 * i
+				if not global.on_tick[tick] then
+					global.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[game.tick + j], {
+				table.insert(global.on_tick[tick], {
 					func = function(vars)
 						vars.surface.create_trivial_smoke{name = "osp_artillery_smoke", position = vars.position}
 					end,
 					vars = vars
 				})
 			end
-			if not global.on_tick[game.tick + 110 + 16 * 5] then
-				global.on_tick[game.tick + 110 + 16 * 5] = {}
+			local tick = game.tick + 110 + 16 * 5
+			if not global.on_tick[tick] then
+				global.on_tick[tick] = {}
 			end
-			table.insert(global.on_tick[game.tick + 110 + 16 * 5], {
+			table.insert(global.on_tick[tick], {
 				func = function(vars)
-					if vars.crosshair then
-						vars.crosshair.destroy()
+					local _crosshair = vars.crosshair
+					if _crosshair then
+						_crosshair.destroy()
 					end
 				end,
 				vars = vars

@@ -90,23 +90,23 @@ for name, spell in pairs(spells) do
 		local item = table.deepcopy(item_temp)
 		item.name = name
 		item.place_result = name
-		item.localised_name = spell.localised_name
+		item.localised_name = {"osp." .. name}
 		item.icon = "__m-spell-pack__/graphics/icons/" .. spell.icon
-		item.icon_size = spell.icon_size
-		item.localised_description = spell.description .. "\n"
+		item.icon_size = 256
 		if spell.order then
 			item.order = spell.order
 		end
+		local description_data = {}
 		if (spell.mana_cost > 0) then
-			item.localised_description = item.localised_description .. "[color=0.4 0.4 1]" .. spell.mana_cost .. " mana[/color] "
+			description_data[#description_data + 1] = {"osp.mana_desc", spell.mana_cost}
 		end
 		if (spell.spirit_cost > 0) then
-			item.localised_description = item.localised_description .. "[color=0.8 0.8 1]" .. spell.spirit_cost ..
-							                             " spirit[/color] "
+			description_data[#description_data + 1] = {"osp.spirit_desc", spell.spirit_cost}
 		end
 		if (spell.cooldown > 1) then
-			item.localised_description = item.localised_description .. "[color=0.99 0.99 0]" .. spell.cooldown .. "s CD[/color]"
+			description_data[#description_data + 1] = {"osp.cooldown_desc", spell.cooldown}
 		end
+		item.localised_description = {"", {"osp." .. name .. "_desc"}, "\n", table.unpack(description_data)}
 		local ent = table.deepcopy(ent_temp)
 		ent.name = name
 		ent.localised_name = spell.localised_name
@@ -123,23 +123,21 @@ for name, spell in pairs(spells) do
 		local grenade = table.deepcopy(dummy_grenade)
 		grenade.name = name
 		grenade.place_result = name
-		grenade.localised_name = spell.localised_name
+		grenade.localised_name = {"osp." .. name}
 		grenade.icon = "__m-spell-pack__/graphics/icons/" .. spell.icon
-		grenade.icon_size = spell.icon_size
-		grenade.localised_description = spell.description .. "\n"
+		grenade.icon_size = 256
 		grenade.capsule_action.attack_parameters.range = spell.range
+		local description_data = {}
 		if (spell.mana_cost > 0) then
-			grenade.localised_description = grenade.localised_description .. "[color=0.4 0.4 1]" .. spell.mana_cost ..
-							                                " mana[/color] "
+			description_data[#description_data + 1] = {"osp.mana_desc", spell.mana_cost}
 		end
 		if (spell.spirit_cost > 0) then
-			grenade.localised_description = grenade.localised_description .. "[color=0.8 0.8 1]" .. spell.spirit_cost ..
-							                                " spirit[/color] "
+			description_data[#description_data + 1] = {"osp.spirit_desc", spell.spirit_cost}
 		end
 		if (spell.cooldown > 1) then
-			grenade.localised_description = grenade.localised_description .. "[color=0.99 0.99 0]" .. spell.cooldown ..
-							                                "s CD[/color]"
+			description_data[#description_data + 1] = {"osp.cooldown_desc", spell.cooldown}
 		end
+		grenade.localised_description = {"", {"osp." .. name .. "_desc"}, "\n", table.unpack(description_data)}
 		-- grenade.capsule_action.attack_parameters.ammo_category = "osp_fireball"
 		-- grenade.capsule_action.attack_parameters.ammo_type.category = "osp_fireball"
 		grenade.capsule_action.attack_parameters.ammo_type.action[1].action_delivery.projectile = name .. "-projectile"
@@ -157,9 +155,9 @@ for name, spell in pairs(spells) do
 		local explosion = table.deepcopy(dummy_explosion)
 		explosion.name = name
 		explosion.animations[1].filename = "__m-spell-pack__/graphics/icons/" .. spell.icon
-		explosion.animations[1].width = spell.icon_size
-		explosion.animations[1].height = spell.icon_size
-		explosion.animations[1].scale = 32 / spell.icon_size
+		explosion.animations[1].width = 256
+		explosion.animations[1].height = 256
+		explosion.animations[1].scale = 32 / 256
 		if spell.light then
 			explosion.light = spell.light
 		end
