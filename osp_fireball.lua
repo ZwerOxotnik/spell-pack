@@ -22,8 +22,8 @@ for i = 0, 25 do
 end
 local fireball_grenade = table.deepcopy(data.raw.capsule.grenade)
 fireball_grenade.name = "osp_fireball_built"
-fireball_grenade.localised_name = "Fireball"
-fireball_grenade.localised_description = "Ignites Targets (stacks)\nBonus damage proportional to target's max hp\nSubsequent Hits deal double damage\nEverything scales with grenade damage modifiers\n20 Mana"
+fireball_grenade.localised_name = {"osp.osp_fireball_built"}
+fireball_grenade.localised_description = {"osp.osp_fireball_built_desc"} -- TODO: improve
 -- fireball_grenade.capsule_action.attack_parameters.ammo_category = "osp_fireball"
 fireball_grenade.capsule_action.attack_parameters.ammo_category = "grenade"
 -- fireball_grenade.capsule_action.attack_parameters.ammo_type.category = "osp_fireball"
