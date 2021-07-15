@@ -1,4 +1,7 @@
-function print(str)
+local floor = math.floor
+local max = math.max
+
+function print(str) -- TODO: check
 	game.players[1].print(str)
 end
 
@@ -8,8 +11,9 @@ function estaminate_width(gui)
 		return 435
 	end
 
-	local gui_width = (gui.style.minimal_width or gui.style.natural_width or 28) + (gui.style.left_padding or 0) +
-					          (gui.style.right_padding or 0) + (gui.style.left_margin or 0) + (gui.style.right_margin or 0)
+	local style = gui.style
+	local gui_width = (style.minimal_width or style.natural_width or 28) + (style.left_padding or 0) +
+					          (style.right_padding or 0) + (style.left_margin or 0) + (style.right_margin or 0)
 	local sub_width = 0
 	for _, b in pairs(gui.children) do
 		local child_width = estaminate_width(b)
@@ -22,7 +26,7 @@ function estaminate_width(gui)
 			end
 		end
 	end
-	return math.max(gui_width, sub_width)
+	return max(gui_width, sub_width)
 end
 
 function create_gui(player)
@@ -70,8 +74,9 @@ function create_gui(player)
 	spirit_flow.style.top_margin = -2
 	spirit_flow.style.bottom_margin = 0
 	-- local bar_flow=flow.add{type="progressbar", name="player_mana"}
-	local spirit = global.players[player.index].spirit
-	local max_spirit = global.players[player.index].max_spirit + global.forces[player.force.name].max_spirit
+	local player_data = global.players[player.index]
+	local spirit = player_data.spirit
+	local max_spirit = player_data.max_spirit + global.forces[player.force.name].max_spirit
 	local bar = spirit_flow.add{type = "progressbar", name = "bar", style = "osp_spirit_progressbar"}
 	bar.ignored_by_interaction = true
 	bar.style.width = 265
@@ -92,7 +97,7 @@ function create_gui(player)
 	values.style.left_padding = 0
 	values.style.font = "var"
 	-- values.style.bottom_margin=50
-	values.caption = math.floor(spirit) .. "/" .. math.floor(max_spirit)
+	values.caption = floor(spirit) .. "/" .. floor(max_spirit)
 	local mana = global.players[player.index].mana
 	local max_mana = global.players[player.index].max_mana + global.forces[player.force.name].max_mana
 	local mana_flow = flow.add{type = "flow", name = "mana_flow", direction = "horizontal"}
@@ -119,21 +124,25 @@ function create_gui(player)
 	values.style.left_padding = 0
 	values.style.font = "var"
 	-- values.style.bottom_margin=50
-	values.caption = math.floor(mana) .. "/" .. math.floor(max_mana)
+	values.caption = floor(mana) .. "/" .. floor(max_mana)
 end
 function update_mana(player)
-	if not player.gui.top.player_mana then
+	local player_mana = player.gui.top.player_mana
+	if not player_mana then
 		return
 	end
-	local mana = global.players[player.index].mana
-	local spirit = global.players[player.index].spirit
-	local max_mana = global.players[player.index].max_mana + global.forces[player.force.name].max_mana
-	local max_spirit = global.players[player.index].max_spirit + global.forces[player.force.name].max_spirit
-	player.gui.top.player_mana.mana_flow.bar.value = mana / max_mana
-	player.gui.top.player_mana.mana_flow.bar.values.caption = math.floor(mana) .. "/" .. math.floor(max_mana)
-	player.gui.top.player_mana.spirit_flow.bar.value = spirit / max_spirit
-	player.gui.top.player_mana.spirit_flow.bar.values.caption = math.floor(spirit) .. "/" .. math.floor(max_spirit)
+	local player_data = global.players[player.index]
+	local mana = player_data.mana
+	local spirit = player_data.spirit
+	local force_data = global.forces[player.force.name]
+	local max_mana = player_data.max_mana + force_data.max_mana
+	local max_spirit = player_data.max_spirit + force_data.max_spirit
+	player_mana.mana_flow.bar.value = mana / max_mana
+	player_mana.mana_flow.bar.values.caption = floor(mana) .. "/" .. floor(max_mana)
+	player_mana.spirit_flow.bar.value = spirit / max_spirit
+	player_mana.spirit_flow.bar.values.caption = floor(spirit) .. "/" .. floor(max_spirit)
 end
+
 script.on_event({defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed}, function(event)
 	local player = game.get_player(event.player_index)
 	if not player.gui.top.player_mana then
@@ -148,8 +157,7 @@ script.on_event({defines.events.on_player_display_resolution_changed, defines.ev
 			filler = filler + estaminate_width(b)
 		end
 	end
-	player.gui.top.player_mana.style.left_margin =
-					(player.display_resolution.width / player.display_scale) * 0.44 - filler
+	player.gui.top.player_mana.style.left_margin = (player.display_resolution.width / player.display_scale) * 0.44 - filler
 	-- 0.75:
 	-- 501=656
 	-- 833=1100
