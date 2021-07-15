@@ -36,12 +36,12 @@ function create_gui(player)
 	if not global.players[player.index] then
 		global.players[player.index] = {
 			mana = 10,
-			max_mana = 100,
-			mana_reg = 1,
+			max_mana = settings.global["osp-max-mana"].value,
+			mana_reg = settings.global["osp-mana-reg"].value,
 			spirit = 0,
-			max_spirit = 100,
-			spirit_reg = 0,
-			spirit_per_kill = 1,
+			max_spirit = settings.global["osp-max-spirit"].value,
+			spirit_reg = settings.global["osp-spirit-reg"].value,
+			spirit_per_kill = settings.global["osp-spirit-per-kill"].value,
 			cooldowns = {},
 			cdr = 0,
 			bonus_effects = {}
@@ -58,7 +58,7 @@ function create_gui(player)
 	-- flow.style.width = 200
 	-- flow.style.height = 200
 	local filler = 0
-	for a, b in pairs(player.gui.top.children) do
+	for _, b in pairs(player.gui.top.children) do
 		filler = filler + estaminate_width(b)
 		-- game.print(b.name)
 	end

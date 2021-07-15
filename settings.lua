@@ -13,6 +13,46 @@ data:extend({
 		setting_type = "runtime-global",
 		default_value = true,
 		order = "b1"
+	}, {
+		type = "int-setting",
+		name = "osp-max-mana",
+		setting_type = "runtime-global",
+		default_value = 100,
+		maximum_value = 10000000,
+		minimum_value = 1,
+		order = "d1"
+	}, {
+		type = "int-setting",
+		name = "osp-max-spirit",
+		setting_type = "runtime-global",
+		default_value = 100,
+		maximum_value = 100000000,
+		minimum_value = 1,
+		order = "d2"
+	}, {
+		type = "double-setting",
+		name = "osp-mana-reg",
+		setting_type = "runtime-global",
+		default_value = 1,
+		maximum_value = 100000000,
+		minimum_value = 0,
+		order = "d3"
+	}, {
+		type = "double-setting",
+		name = "osp-spirit-reg",
+		setting_type = "runtime-global",
+		default_value = 0,
+		maximum_value = 100000000,
+		minimum_value = 0,
+		order = "d4"
+	}, {
+		type = "double-setting",
+		name = "osp-spirit-per-kill",
+		setting_type = "runtime-global",
+		default_value = 1,
+		maximum_value = 100000000,
+		minimum_value = 0,
+		order = "d5"
 	}
 })
 
@@ -35,27 +75,27 @@ local spells_list = {
 for name, _data in pairs(spells_list) do
 	data:extend({
 		{
-			type = "int-setting",
+			type = "double-setting",
 			name = "osp_" .. name .. "_cooldown",
 			setting_type = "startup",
 			default_value = _data.cooldown,
-			maximum_value = 3600,
+			maximum_value = 900000000,
 			minimum_value = 0,
 			order = "osp_cooldown[" .. name .. "]"
 		}, {
-			type = "int-setting",
+			type = "double-setting",
 			name = "osp_" .. name .. "_mana_cost",
 			setting_type = "startup",
 			default_value = _data.mana_cost,
-			maximum_value = 3600,
+			maximum_value = 900000000,
 			minimum_value = 0,
 			order = "osp_mana_cost[" .. name .. "]"
 		}, {
-			type = "int-setting",
+			type = "double-setting",
 			name = "osp_" .. name .. "_spirit_cost",
 			setting_type = "startup",
 			default_value = _data.spirit_cost,
-			maximum_value = 3600,
+			maximum_value = 900000000,
 			minimum_value = 0,
 			order = "osp_spirit_cost[" .. name .. "]"
 		}
