@@ -321,7 +321,9 @@ script.on_event(defines.events.on_tick, function(event)
 	local tick = event.tick
 	if global.on_tick[tick] then
 		for _, func in pairs(global.on_tick[tick]) do
-			func.func(func.vars)
+			if func.func then -- TODO: fix this!!!
+				func.func(func.vars)
+			end
 		end
 		global.on_tick[tick] = nil
 	end

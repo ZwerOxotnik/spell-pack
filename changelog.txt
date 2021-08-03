@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.19.7
+Date: 2021-08-03
+  Bugfixes:
+    - Hotfix to avoid crushes because of some spells in some cases
+  Notes:
+    - Updated by ZwerOxotnik
+    - Apparently, the mod isn't so stable for mutiplayer mode
+---------------------------------------------------------------------------------------------------
 Version: 0.19.6
 Date: 2021-07-15
   Features:
