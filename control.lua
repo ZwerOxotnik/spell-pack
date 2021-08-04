@@ -221,6 +221,8 @@ script.on_event(defines.events.on_player_joined_game, function(event)
 end)
 
 script.on_configuration_changed(function()
+	global.on_osp_sprint_vehicle_data = global.on_osp_sprint_vehicle_data or {}
+
 	-- if not global.version then
 	-- 	for _, player in pairs(game.players) do
 	-- 		if player.gui.top.player_mana then
