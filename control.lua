@@ -5,7 +5,8 @@ require"SPELLS"
 local min = math.min
 local max = math.max
 local floor = math.floor
-local version = 18
+local random = math.random
+local version = 19
 
 
 remote.add_interface("spell-pack", {
@@ -197,6 +198,7 @@ script.on_init(function()
 	global.forces = {}
 	global.clean_cursor = {}
 	global.on_tick = {}
+	global.on_osp_sprint_vehicle_data = {}
 	global.died_ghosts = {}
 	for _, player in pairs(game.players) do
 		create_gui(player)
@@ -298,6 +300,60 @@ function verify_force(player)
 	end
 end
 
+local function check_on_osp_sprint_vehicle(tick)
+	local data = global.on_osp_sprint_vehicle_data[tick]
+	if data then
+		local player = data.player
+		local vehicle_ent = data.vehicle
+		if player and player.valid and vehicle_ent and vehicle_ent.valid then
+			local accel = 0
+			local train = vehicle_ent.train
+			if train then
+				accel = vehicle_ent.prototype.max_energy_usage * 0.3 / train.weight / 100
+				if train.speed >= 0 then
+					train.speed = train.speed + accel
+				else
+					train.speed = train.speed - accel
+				end
+			else
+				local prototype = vehicle_ent.prototype
+				accel = prototype.max_energy_usage * 0.3 / prototype.weight / 100
+				if vehicle_ent.speed >= 0 then
+					vehicle_ent.speed = vehicle_ent.speed + accel
+				else
+					vehicle_ent.speed = vehicle_ent.speed - accel
+				end
+
+				local level = data.level
+				local pos = vehicle_ent.position
+				local surface = vehicle_ent.surface
+				local entity_data = {
+					name = "osp_fire_stream-" .. level,
+					position = vehicle_ent.position,
+					force = "player",
+					player = player,
+					source = pos,
+					target = pos
+				}
+				local x = pos.x - 0.4-- it's kinda weird
+				local y = pos.y - 0.4 -- it's kinda weird
+				surface.create_entity(entity_data)
+				entity_data.x = x + random() / 2
+				entity_data.y = y + random() / 2
+				surface.create_entity(entity_data)
+				entity_data.x = x + random() / 2
+				entity_data.y = y + random() / 2
+				surface.create_entity(entity_data)
+				entity_data.x = x + random() / 2
+				entity_data.y = y + random() / 2
+				surface.create_entity(entity_data)
+			end
+
+		end
+		global.on_osp_sprint_vehicle_data[tick] = nil
+	end
+end
+
 script.on_event(defines.events.on_tick, function(event)
 	local cursor_data = global.clean_cursor
 	for player_index, data in pairs(cursor_data) do
@@ -327,6 +383,8 @@ script.on_event(defines.events.on_tick, function(event)
 		end
 		global.on_tick[tick] = nil
 	end
+
+	check_on_osp_sprint_vehicle(tick)
 end)
 
 script.on_nth_tick(15, function(event)
@@ -717,7 +775,7 @@ do
 	local blink_spirit_cost = spells.osp_blink.spirit_cost
 	local function on_blink(event, offset)
 		local player = game.get_player(event.player_index)
-		if not (player and player.valid) then return end
+		if not (player and player.valid and player.vehicle == nil) then return end
 		local character = player.character
 		if not (character and character.valid) then return end
 

@@ -62,92 +62,15 @@ spells = {
 					error(player, "Has no motor")
 					return false
 				end
-				for i = 1, 60 do
-					if not global.on_tick[game.tick + i] then
-						global.on_tick[game.tick + i] = {}
-					end
-					table.insert(global.on_tick[game.tick + i], {
-						func = function(vars)
-							local vehicle_ent = vars.vehicle
-							if vehicle_ent and vehicle_ent.valid then
-								local accel = 0
-								local train = vehicle_ent.train
-								if train then
-									accel = vehicle_ent.prototype.max_energy_usage * 0.28 / train.weight / 100
-									if train.speed >= 0 then
-										train.speed = train.speed + accel
-									else
-										train.speed = train.speed - accel
-									end
-								else
-									accel = vehicle_ent.prototype.max_energy_usage * 0.28 / vehicle_ent.prototype.weight / 100
-									if vehicle_ent.speed >= 0 then
-										vehicle_ent.speed = vehicle_ent.speed + accel
-									else
-										vehicle_ent.speed = vehicle_ent.speed - accel
-									end
-								end
-							end
-						end,
-						vars = {vehicle = vehicle}
-					})
-				end
-				-- flames:
-				for i = 1, 60 do
-					if not global.on_tick[game.tick + i * 1] then
-						global.on_tick[game.tick + i * 1] = {}
-					end
-					table.insert(global.on_tick[game.tick + i * 1], {
-						func = function(vars)
-							if vars.player.character and vars.player.character.valid then
-								local pos = vars.player.position
-								vars.player.surface.create_entity{
-									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
-									force = "player",
-									player = vars.player,
-									source = pos,
-									target = pos
-								}
-								local pos2 = {}
-								pos2.x = pos.x - 0.25 + random() / 2
-								pos2.y = pos.y - 0.25 + random() / 2
-								vars.player.surface.create_entity{
-									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
-									force = "player",
-									player = vars.player,
-									source = pos2,
-									target = pos2
-								}
-								pos2.x = pos.x - 0.25 + random() / 2
-								pos2.y = pos.y - 0.25 + random() / 2
-								vars.player.surface.create_entity{
-									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
-									force = "player",
-									player = vars.player,
-									source = pos2,
-									target = pos2
-								}
-								pos2.x = pos.x - 0.25 + random() / 2
-								pos2.y = pos.y - 0.25 + random() / 2
-								vars.player.surface.create_entity{
-									name = "osp_fire_stream-" .. vars.level,
-									position = vars.player.position,
-									force = "player",
-									player = vars.player,
-									source = pos2,
-									target = pos2
-								}
-							end
-						end,
-						vars = {player = player, level = level}
-					})
+				-- TODO: improve (add support for several players)
+				for i = 1, 120, 3 do
+					global.on_osp_sprint_vehicle_data[game.tick + i] = {vehicle = vehicle, player = player, level = level}
 				end
 
-				global.friendly_fire[force.name].tick = max(global.friendly_fire[force.name].tick or 1,
-								game.tick + 241)
+				global.friendly_fire[force.name].tick = max(
+					global.friendly_fire[force.name].tick or 1,
+					game.tick + 241
+				)
 				if not global.on_tick[game.tick + 241] then
 					global.on_tick[game.tick + 241] = {}
 				end

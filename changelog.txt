@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.19.8
+Date: 2021-08-03
+  Changes:
+    - Changed "Blazing fast" spell for vehicles
+  Bugfixes:
+    - Fixed teleportation by hotkeys for vehicles
+  Notes:
+    - Updated by ZwerOxotnik
+---------------------------------------------------------------------------------------------------
 Version: 0.19.7
 Date: 2021-08-03
   Bugfixes:
