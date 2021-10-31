@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.19.10
+Date: 2021-10-31
+  Bugfixes:
+    - Removed unnecessary messages when something/someone changed settings
+  Notes:
+    - Updated by ZwerOxotnik
+---------------------------------------------------------------------------------------------------
 Version: 0.19.9
 Date: 2021-08-04
   Bugfixes:

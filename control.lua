@@ -222,6 +222,7 @@ end)
 
 script.on_configuration_changed(function()
 	global.on_osp_sprint_vehicle_data = global.on_osp_sprint_vehicle_data or {}
+	global.version = version
 
 	-- if not global.version then
 	-- 	for _, player in pairs(game.players) do
@@ -745,15 +746,15 @@ end
 
 do
 	local function update_player_setting(name, value)
-		for player_index, _ in pairs(game.players) do
+		for player_index in pairs(game.players) do
 			global.players[player_index][name] = value
 		end
 	end
 	script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 		if event.setting_type ~= "runtime-global" then return end
 
+		-- Looks weird, refactor
 		local name = event.setting
-		game.print(name)
 		if name == "osp-max-mana" then
 			update_player_setting("max_mana", settings.global[name].value)
 		elseif name == "osp-max-spirit" then
