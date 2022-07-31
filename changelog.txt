@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.20.0
+Date: 2022-07-31
+  Bugfixes:
+    - Fixed rare bugs
+  Changes:
+    - Optimized
+    - Refactored some stuff
+    - Improved stability
+  Notes:
+    - Updated by ZwerOxotnik
+---------------------------------------------------------------------------------------------------
 Version: 0.19.10
 Date: 2021-10-31
   Bugfixes:

@@ -1,19 +1,21 @@
-local floor = math.floor
 local max = math.max
 
 function print(str) -- TODO: check
-	game.players[1].print(str)
+	for _, player in pairs(game.connected_players) do
+		if player.valid and player.admin then
+			player.print(str)
+		end
+	end
 end
 
 function estaminate_width(gui)
-	-- game.print(gui.name)
 	if gui.name == "auto_research_gui" then
 		return 435
 	end
 
 	local style = gui.style
 	local gui_width = (style.minimal_width or style.natural_width or 28) + (style.left_padding or 0) +
-					          (style.right_padding or 0) + (style.left_margin or 0) + (style.right_margin or 0)
+										(style.right_padding or 0) + (style.left_margin or 0) + (style.right_margin or 0)
 	local sub_width = 0
 	for _, b in pairs(gui.children) do
 		local child_width = estaminate_width(b)
@@ -27,120 +29,6 @@ function estaminate_width(gui)
 		end
 	end
 	return max(gui_width, sub_width)
-end
-
-function create_gui(player)
-	if player.gui.top.player_mana then
-		player.gui.top.player_mana.destroy()
-	end
-	if not global.players[player.index] then
-		global.players[player.index] = {
-			mana = 10,
-			max_mana = settings.global["osp-max-mana"].value,
-			mana_reg = settings.global["osp-mana-reg"].value,
-			spirit = 0,
-			max_spirit = settings.global["osp-max-spirit"].value,
-			spirit_reg = settings.global["osp-spirit-reg"].value,
-			spirit_per_kill = settings.global["osp-spirit-per-kill"].value,
-			cooldowns = {},
-			cdr = 0,
-			bonus_effects = {}
-		}
-	end
-	verify_force(player)
-	if not global.enabledbars then
-		return
-	end
-	-- local flow = player.gui.top.add{type="frame", name="test0",direction="horizontal"}
-	-- flow.style.width = 200
-	-- flow.style.height = 200
-	-- local flow = player.gui.top.add{type="frame", name="test1",direction="horizontal"}
-	-- flow.style.width = 200
-	-- flow.style.height = 200
-	local filler = 0
-	for _, b in pairs(player.gui.top.children) do
-		filler = filler + estaminate_width(b)
-		-- game.print(b.name)
-	end
-	-- game.print(filler)
-	local flow = player.gui.top.add{type = "flow", name = "player_mana", direction = "vertical"}
-	-- flow.style.top_margin = player.display_resolution.height/player.display_scale-190
-	-- flow.style.left_margin = 886
-	flow.style.left_margin = (player.display_resolution.width / player.display_scale) * 0.44 - filler
-	flow.style.width = 265
-	-- flow.ignored_by_interaction = true
-	-- flow.style.height = 20
-	local spirit_flow = flow.add{type = "flow", name = "spirit_flow", direction = "horizontal"}
-	spirit_flow.style.top_margin = -2
-	spirit_flow.style.bottom_margin = 0
-	-- local bar_flow=flow.add{type="progressbar", name="player_mana"}
-	local player_data = global.players[player.index]
-	local spirit = player_data.spirit
-	local max_spirit = player_data.max_spirit + global.forces[player.force.name].max_spirit
-	local bar = spirit_flow.add{type = "progressbar", name = "bar", style = "osp_spirit_progressbar"}
-	bar.ignored_by_interaction = true
-	bar.style.width = 265
-	bar.style.height = 14
-	bar.style.top_margin = 4
-	bar.style.bottom_margin = 0
-	bar.style.horizontally_stretchable = false
-	bar.style.horizontally_squashable = false
-	bar.value = spirit / max_spirit
-	bar.style.color = {r = 0.8, g = 0.8, b = 1}
-	bar.style.right_margin = 0
-	bar.style.right_padding = 0
-	local values = bar.add{type = "label", name = "values"}
-	values.style.horizontal_align = "right"
-	values.style.width = 264
-	values.style.left_margin = -3
-	values.style.top_padding = -3
-	values.style.left_padding = 0
-	values.style.font = "var"
-	-- values.style.bottom_margin=50
-	values.caption = floor(spirit) .. "/" .. floor(max_spirit)
-	local mana = global.players[player.index].mana
-	local max_mana = global.players[player.index].max_mana + global.forces[player.force.name].max_mana
-	local mana_flow = flow.add{type = "flow", name = "mana_flow", direction = "horizontal"}
-	mana_flow.style.top_margin = -2
-	mana_flow.style.bottom_margin = 0
-	-- local bar_flow=flow.add{type="progressbar", name="player_mana"}
-	local bar = mana_flow.add{type = "progressbar", name = "bar", style = "osp_mana_progressbar"}
-	bar.ignored_by_interaction = true
-	bar.style.horizontal_align = "right"
-	bar.style.width = 265
-	bar.style.height = 14
-	bar.style.top_margin = 0
-	bar.style.horizontally_stretchable = false
-	bar.style.horizontally_squashable = false
-	bar.value = mana / max_mana
-	bar.style.color = {r = 0.2, g = 0.2, b = 1}
-	bar.style.right_margin = 0
-	bar.style.right_padding = 0
-	local values = bar.add{type = "label", name = "values"}
-	values.style.horizontal_align = "right"
-	values.style.width = 264
-	values.style.left_margin = -3
-	values.style.top_padding = -3
-	values.style.left_padding = 0
-	values.style.font = "var"
-	-- values.style.bottom_margin=50
-	values.caption = floor(mana) .. "/" .. floor(max_mana)
-end
-function update_mana(player)
-	local player_mana = player.gui.top.player_mana
-	if not player_mana then
-		return
-	end
-	local player_data = global.players[player.index]
-	local mana = player_data.mana
-	local spirit = player_data.spirit
-	local force_data = global.forces[player.force.name]
-	local max_mana = player_data.max_mana + force_data.max_mana
-	local max_spirit = player_data.max_spirit + force_data.max_spirit
-	player_mana.mana_flow.bar.value = mana / max_mana
-	player_mana.mana_flow.bar.values.caption = floor(mana) .. "/" .. floor(max_mana)
-	player_mana.spirit_flow.bar.value = spirit / max_spirit
-	player_mana.spirit_flow.bar.values.caption = floor(spirit) .. "/" .. floor(max_spirit)
 end
 
 script.on_event({defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed}, function(event)

@@ -96,13 +96,14 @@ remote.add_interface("spell-pack", {
 			pctspirit = spirit / max_spirit
 		}
 	end,
+	-- TODO: recheck
 	togglebars = function(modname, onoff)
 		global.togglebars[modname] = onoff
 		global.enabledbars = true
-		for modname, onoff in pairs(global.togglebars) do
-			if not game.active_mods[modname] then
-				global.togglebars[modname] = nil
-			elseif not onoff then
+		for _modname, _onoff in pairs(global.togglebars) do
+			if not game.active_mods[_modname] then
+				global.togglebars[_modname] = nil
+			elseif not _onoff then
 				global.enabledbars = false
 			end
 		end
@@ -110,6 +111,8 @@ remote.add_interface("spell-pack", {
 	end
 })
 
+
+-- TODO: refactor
 function max_range(pos1, pos2, range)
 	local distance = distance(pos1, pos2)
 	pos2.x = pos2.x - pos1.x
@@ -121,6 +124,134 @@ function max_range(pos1, pos2, range)
 	return pos1
 end
 
+local function verify_force(force_name)
+	if not global.forces[force_name] then
+		global.forces[force_name] = {
+			max_mana = 0,
+			mana_reg = 0,
+			max_spirit = 0,
+			spirit_reg = 0,
+			spirit_per_kill = 0,
+			cdr = 0,
+			bonus_effects = {}
+		}
+	end
+end
+
+
+local SPIRIT_BAR_COLOR = {r = 0.8, g = 0.8, b = 1}
+local MANA_BAR_COLOR = {r = 0.2, g = 0.2, b = 1}
+local PLAYER_MANA_FLOW = {type = "flow", name = "player_mana", direction = "vertical"}
+local OSP_MAN_PROGRESSBAR = {type = "progressbar", name = "bar", style = "osp_mana_progressbar"}
+local OSP_SPIRIT_PROGRESSBAR = {type = "progressbar", name = "bar", style = "osp_spirit_progressbar"}
+local SPIRIT_FLOW = {type = "flow", name = "spirit_flow", direction = "horizontal"}
+local MANA_FLOW = {type = "flow", name = "mana_flow", direction = "horizontal"}
+local VALUES_LABEL = {type = "label", name = "values"}
+-- TOOD: refactor! create styles at the data stage!
+function create_gui(player)
+	local mana_frame = player.gui.top.player_mana
+	if mana_frame then
+		mana_frame.destroy()
+	end
+	local player_index = player.index
+	if not global.players[player_index] then
+		global.players[player_index] = {
+			mana = 10,
+			max_mana = settings.global["osp-max-mana"].value,
+			mana_reg = settings.global["osp-mana-reg"].value,
+			spirit = 0,
+			max_spirit = settings.global["osp-max-spirit"].value,
+			spirit_reg = settings.global["osp-spirit-reg"].value,
+			spirit_per_kill = settings.global["osp-spirit-per-kill"].value,
+			cooldowns = {},
+			cdr = 0,
+			bonus_effects = {}
+		}
+	end
+	local force_name = player.force.name
+	verify_force(force_name)
+	if not global.enabledbars then
+		return
+	end
+	-- local flow = player.gui.top.add{type="frame", name="test0",direction="horizontal"}
+	-- flow.style.width = 200
+	-- flow.style.height = 200
+	-- local flow = player.gui.top.add{type="frame", name="test1",direction="horizontal"}
+	-- flow.style.width = 200
+	-- flow.style.height = 200
+	local filler = 0
+	for _, b in pairs(player.gui.top.children) do
+		filler = filler + estaminate_width(b)
+		-- game.print(b.name)
+	end
+	-- game.print(filler)
+	local flow = player.gui.top.add(PLAYER_MANA_FLOW)
+	-- flow.style.top_margin = player.display_resolution.height/player.display_scale-190
+	-- flow.style.left_margin = 886
+	flow.style.left_margin = (player.display_resolution.width / player.display_scale) * 0.44 - filler
+	flow.style.width = 265
+	-- flow.ignored_by_interaction = true
+	-- flow.style.height = 20
+	local spirit_flow = flow.add(SPIRIT_FLOW)
+	spirit_flow.style.top_margin = -2
+	spirit_flow.style.bottom_margin = 0
+	-- local bar_flow=flow.add{type="progressbar", name="player_mana"}
+	local player_data = global.players[player_index]
+	local force_data = global.forces[force_name]
+	local spirit = player_data.spirit
+	local max_spirit = player_data.max_spirit + force_data.max_spirit
+	local spirit_bar = spirit_flow.add(OSP_SPIRIT_PROGRESSBAR)
+	spirit_bar.ignored_by_interaction = true
+	spirit_bar.value = spirit / max_spirit
+	local spirit_bar_style = spirit_bar.style
+	spirit_bar_style.width = 265
+	spirit_bar_style.height = 14
+	spirit_bar_style.top_margin = 4
+	spirit_bar_style.bottom_margin = 0
+	spirit_bar_style.horizontally_stretchable = false
+	spirit_bar_style.horizontally_squashable = false
+	spirit_bar_style.color = SPIRIT_BAR_COLOR
+	spirit_bar_style.right_margin = 0
+	spirit_bar_style.right_padding = 0
+	local spirit_values = spirit_bar.add(VALUES_LABEL)
+	spirit_values.style.horizontal_align = "right"
+	spirit_values.style.width = 264
+	spirit_values.style.left_margin = -3
+	spirit_values.style.top_padding = -3
+	spirit_values.style.left_padding = 0
+	spirit_values.style.font = "var"
+	-- values.style.bottom_margin=50
+	spirit_values.caption = floor(spirit) .. "/" .. floor(max_spirit)
+	local mana = player_data.mana
+	local max_mana = player_data.max_mana + force_data.max_mana
+	local mana_flow = flow.add(MANA_FLOW)
+	mana_flow.style.top_margin = -2
+	mana_flow.style.bottom_margin = 0
+	-- local bar_flow=flow.add{type="progressbar", name="player_mana"}
+	local mana_bar = mana_flow.add(OSP_MAN_PROGRESSBAR)
+	local mana_bar_style = mana_bar.style
+	mana_bar.value = mana / max_mana
+	mana_bar.ignored_by_interaction = true
+	mana_bar_style.horizontal_align = "right"
+	mana_bar_style.width = 265
+	mana_bar_style.height = 14
+	mana_bar_style.top_margin = 0
+	mana_bar_style.horizontally_stretchable = false
+	mana_bar_style.horizontally_squashable = false
+	mana_bar_style.color = MANA_BAR_COLOR
+	mana_bar_style.right_margin = 0
+	mana_bar_style.right_padding = 0
+	local mana_values = mana_bar.add(VALUES_LABEL)
+	mana_values.style.horizontal_align = "right"
+	mana_values.style.width = 264
+	mana_values.style.left_margin = -3
+	mana_values.style.top_padding = -3
+	mana_values.style.left_padding = 0
+	mana_values.style.font = "var"
+	-- values.style.bottom_margin=50
+	mana_values.caption = floor(mana) .. "/" .. floor(max_mana)
+end
+
 function register_conditional_event_handlers()
 	script.on_event("auto_research_toggle", function(event)
 		local player = game.get_player(event.player_index)
@@ -128,6 +259,25 @@ function register_conditional_event_handlers()
 
 		create_gui(player)
 	end)
+end
+
+local function update_mana_ui(player)
+	local player_mana = player.gui.top.player_mana
+	if not player_mana then
+		return
+	end
+	local player_data = global.players[player.index]
+	local mana = player_data.mana
+	local spirit = player_data.spirit
+	local force_data = global.forces[player.force.name]
+	local max_mana = player_data.max_mana + force_data.max_mana
+	local max_spirit = player_data.max_spirit + force_data.max_spirit
+	local mana_bar = player_mana.mana_flow.bar
+	mana_bar.value = mana / max_mana
+	mana_bar.values.caption = floor(mana) .. "/" .. floor(max_mana)
+	local spirit_bar = player_mana.spirit_flow.bar
+	spirit_bar.value = spirit / max_spirit
+	spirit_bar.values.caption = floor(spirit) .. "/" .. floor(max_spirit)
 end
 
 script.on_load(function()
@@ -178,7 +328,7 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
 				else
 					player_data.spirit = player_data.spirit - spirit_cost
 				end
-				update_mana(player)
+				update_mana_ui(player)
 				local cd = max(0, (spell.cooldown or 0) * (1 - player_data.cdr))
 				player_data.cooldowns[spell_name] = cd
 				global.clean_cursor[player_index] = {name = spell_name, count = max(1, floor(cd)), clean = true}
@@ -266,8 +416,10 @@ script.on_configuration_changed(function()
 	-- 	global.togglebars = {}
 	-- 	global.enabledbars = true
 	-- 	global.forces = {}
-	-- 	for _, player in pairs(game.players) do
-	-- 		verify_force(player)
+	-- 	for _, force in pairs(game.forces) do
+	--		if force.valid and #force.players > 0 then
+	-- 			verify_force(force.name)
+	--		end
 	-- 	end
 	-- 	global.version = 7
 	-- end
@@ -282,26 +434,12 @@ script.on_configuration_changed(function()
 end)
 
 script.on_event({defines.events.on_forces_merged, defines.events.on_player_changed_force}, function(event)
-	for _, player in pairs(game.players) do
-		if player and player.valid then
-			verify_force(player)
+	for _, force in pairs(game.forces) do
+		if force.valid and #force.players > 0 then
+			verify_force(force.name)
 		end
 	end
 end)
-
-function verify_force(player)
-	if not global.forces[player.force.name] then
-		global.forces[player.force.name] = {
-			max_mana = 0,
-			mana_reg = 0,
-			max_spirit = 0,
-			spirit_reg = 0,
-			spirit_per_kill = 0,
-			cdr = 0,
-			bonus_effects = {}
-		}
-	end
-end
 
 local function check_on_osp_sprint_vehicle(tick)
 	local data = global.on_osp_sprint_vehicle_data[tick]
@@ -390,13 +528,17 @@ script.on_event(defines.events.on_tick, function(event)
 	check_on_osp_sprint_vehicle(tick)
 end)
 
+-- TODO: refactor
 script.on_nth_tick(15, function(event)
 	local players_data = global.players
+	local forces_data = global.forces
 	for _, player in pairs(game.connected_players) do
-		if global.players[player.index] then
-			verify_force(player)
-			local player_data = players_data[player.index]
-			local force_data = global.forces[player.force.name]
+		local player_index = player.index
+		if players_data[player_index] then
+			local force_name = player.force.name
+			verify_force(force_name)
+			local player_data = players_data[player_index]
+			local force_data = forces_data[force_name]
 			player_data.mana = min(
 				player_data.max_mana + force_data.max_mana,
 				player_data.mana + (player_data.mana_reg + force_data.mana_reg) / 4
@@ -405,7 +547,7 @@ script.on_nth_tick(15, function(event)
 				player_data.max_spirit + force_data.max_spirit,
 				player_data.spirit + (player_data.spirit_reg + force_data.spirit_reg) / 4
 			)
-			update_mana(player)
+			update_mana_ui(player)
 		end
 	end
 	for unit_number, tbl in pairs(global.repairing) do
@@ -442,41 +584,57 @@ script.on_nth_tick(15, function(event)
 	end
 end)
 
+local stack_data = {name = ''}
 script.on_nth_tick(10, function(event)
 	local verify_inventories = global.verify_inventories
 	for _, player in pairs(game.connected_players) do
-		local inventory = player.get_main_inventory()
-		local verify_inventory = verify_inventories[player.index]
-		if inventory and verify_inventory then
-			for spell_name, tick in pairs(verify_inventory) do
-				if tick + 121 > event.tick then
-					local stack = inventory.find_item_stack(spell_name)
-					if not stack then
-						player.insert{name = spell_name}
+		if player.valid then
+			local verify_inventory = verify_inventories[player.index]
+			if verify_inventory then
+				local inventory = player.get_main_inventory()
+				if inventory then
+					local find_item_stack = inventory.find_item_stack
+					for spell_name, tick in pairs(verify_inventory) do
+						if tick + 121 > event.tick then
+							local stack = find_item_stack(spell_name)
+							if not stack then
+								stack_data.name = spell_name
+								player.insert(stack_data)
+							end
+						else
+							verify_inventory[spell_name] = nil
+						end
 					end
-				else
-					verify_inventory[spell_name] = nil
 				end
 			end
 		end
 	end
 end)
 
-script.on_nth_tick(30, function(event)
+script.on_nth_tick(30, function()
+	local item_prototypes = game.item_prototypes
 	for _, player in pairs(game.connected_players) do
-		local inventory = player.get_main_inventory()
-		if inventory then
-			for spell_name, spell in pairs(spells) do
-				local cooldowns = global.players[player.index].cooldowns
-				if not spell.ignore_cooldown then
-					cooldowns[spell_name] = max(
-						0,
-						(cooldowns[spell_name] or 1) - 0.5
-					)
-					if game.item_prototypes[spell_name] then
-						local stack = inventory.find_item_stack(spell_name)
-						if stack then
-							stack.count = max(1, floor(cooldowns[spell_name]))
+		if player.valid then
+			local inventory = player.get_main_inventory()
+			if inventory then
+				local find_item_stack = inventory.find_item_stack
+				local player_data = global.players[player.index]
+				for spell_name, spell in pairs(spells) do
+					local cooldowns = player_data.cooldowns
+					if not spell.ignore_cooldown then
+						local cooldown = cooldowns[spell_name]
+						if cooldown then
+							cooldown = cooldown - 0.5
+							cooldowns[spell_name] = (cooldown > 0 and cooldown) or 0
+						else
+							cooldowns[spell_name] = 0.5
+						end
+						if item_prototypes[spell_name] then
+							local stack = find_item_stack(spell_name)
+							if stack then
+								local count = floor(cooldowns[spell_name])
+								stack.count = (count > 1 and count) or 1
+							end
 						end
 					end
 				end
@@ -487,7 +645,9 @@ end)
 
 script.on_nth_tick(1800, function()
 	for _, player in pairs(game.connected_players) do
-		create_gui(player)
+		if player.valid then
+			create_gui(player)
+		end
 	end
 end)
 
@@ -505,24 +665,32 @@ function dbg(str)
 			str = type(str)
 		end
 	end
-	game.players[1].print(game.tick .. " " .. str)
+	for _, player in pairs(game.connected_players) do
+		if player.valid and player.admin then
+			player.print(game.tick .. " " .. str)
+		end
+	end
 end
 
 function distance(pos1, pos2)
-	local x = (pos1.x - pos2.x) ^ 2
-	local y = (pos1.y - pos2.y) ^ 2
-	return (x + y) ^ 0.5
+	local xdiff = pos1.x - pos2.x
+	local ydiff = pos1.y - pos2.y
+	return (xdiff * xdiff + ydiff * ydiff)^0.5
 end
 
+-- TODO: refactor
 -- script.on_event({defines.events.on_robot_built_entity,defines.events.on_built_entity}, function(event)
 script.on_event({defines.events.on_built_entity}, function(event)
 	local created_entity = event.created_entity
+	if not (created_entity and created_entity.valid) then return end
+
 	local spell_name = created_entity.name
 	local spell = spells[spell_name]
 	if spell and not spell.trigger_created_entity then
 		local player_index = event.player_index
 		local player = game.get_player(player_index)
 		if not (player and player.valid) then return end
+		local force_name = player.force.name
 		local player_data = global.players[player_index]
 		local verify_inventory = global.verify_inventories[player_index]
 		local cooldowns = player_data.cooldowns
@@ -540,11 +708,11 @@ script.on_event({defines.events.on_built_entity}, function(event)
 			return
 		end
 
-		if (not verify_inventory or not verify_inventory[spell_name] or verify_inventory[spell_name] + 1 <event.tick)
+		if (not verify_inventory or not verify_inventory[spell_name] or verify_inventory[spell_name] + 1 < event.tick)
 			and (not cooldowns[spell_name] or cooldowns[spell_name] < 1)
 		then
-			verify_force(player)
-			local force_data = global.forces[player.force.name]
+			verify_force(force_name)
+			local force_data = global.forces[force_name]
 			local success = spell.func(player, created_entity.position)
 			if success then
 				local effect = player_data.bonus_effects[spell_name] or
@@ -563,7 +731,7 @@ script.on_event({defines.events.on_built_entity}, function(event)
 					(spell.cooldown or 0) * (1 - player_data.cdr - force_data.cdr)
 				)
 				player.insert{name = spell_name, count = max(2, floor(cd))}
-				update_mana(player)
+				update_mana_ui(player)
 				cooldowns[spell_name] = cd
 				global.clean_cursor[player_index] = {name = spell_name, count = max(1, floor(cd)), clean = true}
 				player.clear_cursor()
@@ -582,6 +750,7 @@ script.on_event({defines.events.on_built_entity}, function(event)
 	end
 end)
 
+-- TOOD: recheck, something is very wrong with event.entity and event.created_entity
 script.on_event(defines.events.on_player_used_capsule, function(event)
 	local item = event.item
 	local spell_name = item.name
@@ -590,14 +759,15 @@ script.on_event(defines.events.on_player_used_capsule, function(event)
 		local player = game.get_player(player_index)
 		if not (player and player.valid) then return end
 
+		local force_name = player.force.name
 		local player_data = global.players[player_index]
 		local cooldown = player_data.cooldowns[spell_name]
 		if (not cooldown or cooldown < 1) then
-			verify_force(player)
+			verify_force(force_name)
 			local spell = spells[spell_name]
 			local success = spell.func(player, event.position)
 			if success then
-				local force_data = global.forces[player.force.name]
+				local force_data = global.forces[force_name]
 				local effect = player_data.bonus_effects[spell_name] or force_data.bonus_effects[spell_name]
 				if effect and not spells[event.entity.name].trigger_created_entity then
 					global.bonus_effects[effect](player, event.created_entity.position)
@@ -615,20 +785,20 @@ script.on_event(defines.events.on_player_used_capsule, function(event)
 					(spell.cooldown or 0) * (1 - player_data.cdr - force_data.cdr)
 				)
 				player.insert{name = spell_name, count = max(2, floor(cd))}
-				update_mana(player)
+				update_mana_ui(player)
 				player_data.cooldowns[spell_name] = cd
-				global.clean_cursor[event.player_index] = {name = spell_name, count = max(1, floor(cd)), clean = true}
+				global.clean_cursor[player_index] = {name = spell_name, count = max(1, floor(cd)), clean = true}
 				player.clear_cursor()
 				local verify_inventories = global.verify_inventories
 				if not verify_inventories[player_index] then
 					verify_inventories[player_index] = {}
 				end
-				verify_inventories[player.index][spell_name] = event.tick
+				verify_inventories[player_index][spell_name] = event.tick
 			else
-				global.clean_cursor[event.player_index] = {name = spell_name, count = 1, clean = false}
+				global.clean_cursor[player_index] = {name = spell_name, count = 1, clean = false}
 			end
 		else
-			global.clean_cursor[event.player_index] = {name = spell_name, count = 1, clean = true}
+			global.clean_cursor[player_index] = {name = spell_name, count = 1, clean = true}
 		end
 	end
 end)
@@ -746,8 +916,9 @@ end
 
 do
 	local function update_player_setting(name, value)
+		local players_data = global.players
 		for player_index in pairs(game.players) do
-			global.players[player_index][name] = value
+			players_data[player_index][name] = value
 		end
 	end
 	script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
@@ -820,7 +991,7 @@ do
 				(blink_cooldown or 0) * (1 - player_data.cdr - force_data.cdr)
 			)
 			player.insert{name = "osp_blink", count = max(2, floor(cd))}
-			update_mana(player)
+			update_mana_ui(player)
 			cooldowns.osp_blink = cd
 			global.clean_cursor[event.player_index] = {name = "osp_blink", count = max(1, floor(cd)), clean = true}
 			player.clear_cursor()
