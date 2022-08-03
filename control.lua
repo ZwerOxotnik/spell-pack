@@ -495,19 +495,20 @@ local function check_on_osp_sprint_vehicle(tick)
 	end
 end
 
+local _stack_data = {name = '', count = 1}
 script.on_event(defines.events.on_tick, function(event)
 	local cursor_data = global.clean_cursor
-	for player_index, data in pairs(cursor_data) do
+	for player_index, data in pairs(cursor_data) do --TOOD: store LuaPlayer
 		local player = game.get_player(player_index)
 		if type(data) == "table" then
-			local name = data.name
-			local count = data.count
+			_stack_data.name = data.name
+			_stack_data.namecount = data.count
 			if data.clean then
-				player.insert{name = name, count = count}
+				player.insert(_stack_data)
 				player.clear_cursor()
 			else
-				player.insert{name = name, count = count}
-				player.cursor_stack.set_stack{name = name, count = count}
+				player.insert(_stack_data)
+				player.cursor_stack.set_stack(_stack_data)
 			end
 		else
 			player.clear_cursor()
