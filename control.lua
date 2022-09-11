@@ -446,7 +446,7 @@ local function check_on_osp_sprint_vehicle(tick)
 	if data then
 		local player = data.player
 		local vehicle_ent = data.vehicle
-		if player and player.valid and vehicle_ent and vehicle_ent.valid then
+		if player and player.valid and vehicle_ent and vehicle_ent.valid and vehicle_ent.type ~= "spider-vehicle" then
 			local accel = 0
 			local train = vehicle_ent.train
 			if train then
@@ -466,18 +466,18 @@ local function check_on_osp_sprint_vehicle(tick)
 				end
 
 				local level = data.level
-				local pos = vehicle_ent.position
+				local vehicle_pos = vehicle_ent.position
 				local surface = vehicle_ent.surface
 				local entity_data = {
 					name = "osp_fire_stream-" .. level,
 					position = vehicle_ent.position,
 					force = "player",
 					player = player,
-					source = pos,
-					target = pos
+					source = vehicle_pos,
+					target = vehicle_pos
 				}
-				local x = pos.x - 0.4-- it's kinda weird
-				local y = pos.y - 0.4 -- it's kinda weird
+				local x = vehicle_pos.x - 0.4-- it's kinda weird
+				local y = vehicle_pos.y - 0.4 -- it's kinda weird
 				surface.create_entity(entity_data)
 				entity_data.x = x + random() / 2
 				entity_data.y = y + random() / 2
@@ -489,7 +489,6 @@ local function check_on_osp_sprint_vehicle(tick)
 				entity_data.y = y + random() / 2
 				surface.create_entity(entity_data)
 			end
-
 		end
 		global.on_osp_sprint_vehicle_data[tick] = nil
 	end

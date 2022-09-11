@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.20.20
+Date: 2022-09-11
+  Bugfixes:
+    - Fixed crush with "Blazing Fast" spell when a player in a spidertron
+  Notes:
+    - Updated by ZwerOxotnik
+---------------------------------------------------------------------------------------------------
 Version: 0.20.0
 Date: 2022-07-31
   Bugfixes:
