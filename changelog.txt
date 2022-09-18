@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.20.21
+Date: 2022-09-18
+  Locale:
+    - Updated Chinese Simplified translation (thanks to @tlzwode on crowdin)
+    - Translations: https://crowdin.com/project/factorio-mods-localization (thank you for contributions, I really appreciate it)
+---------------------------------------------------------------------------------------------------
 Version: 0.20.20
 Date: 2022-09-11
   Bugfixes:
