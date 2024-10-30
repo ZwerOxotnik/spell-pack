@@ -48,7 +48,7 @@ fireball_projectile.animation = fireutil.create_fire_pictures({
 	shift = {0.05, 0.75}
 })
 fireball_projectile.action[1].action_delivery.target_effects[1].entity_name = "osp_fireball"
-fireball_projectile.action[1].action_delivery.target_effects[1].trigger_created_entity = "true"
+fireball_projectile.action[1].action_delivery.target_effects[1].trigger_created_entity = true
 fireball_projectile.action[1].action_delivery.target_effects[2].entity_name = "osp_medium_scorchmark"
 -- fireball_projectile.action[2].action_delivery.target_effects[2].entity_name = "osp_big-explosion"
 -- fireball_projectile.action[2].action_delivery.target_effects[1].damage.type = "osp_fireball"
@@ -105,6 +105,7 @@ fireball_explo.sound = {
 		{filename = "__base__/sound/fight/large-explosion-2.ogg", volume = 0.7}
 	}
 }
+
 local fireball_built = table.deepcopy(fireball_explo)
 fireball_built.name = "osp_fireball_built"
 fireball_built.sound = nil
@@ -126,9 +127,9 @@ local fireball_recipe = {
 	name = "osp_fireball_built",
 	ingredients = {}, -- {"wood", 2}},
 	energy_required = 1,
-	result = "osp_fireball_built",
 	enabled = true
 }
+fireball_recipe.results = {{type = "item", name = fireball_recipe.name, amount = 1}}
 
 data:extend({
 	-- fireball_cat,

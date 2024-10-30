@@ -318,139 +318,140 @@ function get_fireutil()
 		local fire_animation_speed = opts.animation_speed or 0.5
 		local fire_scale = opts.scale or 1
 		local fire_tint = {r = 1, g = 1, b = 1, a = 1}
-		local fire_flags = {"compressed"}
+		local fire_flags = {} -- TODO: recheck "compressed"
 		if not opts.shift then
 			opts.shift[1] = 0
 			opts.shift[2] = 0
 		end
 		local retval = {
+			-- {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-13.png",
+			-- 	line_length = 8,
+			-- 	width = 60,
+			-- 	height = 118,
+			-- 	frame_count = 25,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.0390625 + opts.shift[1], -0.90625 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-12.png",
+			-- 	line_length = 8,
+			-- 	width = 63,
+			-- 	height = 116,
+			-- 	frame_count = 25,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.015625 + opts.shift[1], -0.914065 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-11.png",
+			-- 	line_length = 8,
+			-- 	width = 61,
+			-- 	height = 122,
+			-- 	frame_count = 25,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.0078125 + opts.shift[1], -0.90625 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-10.png",
+			-- 	line_length = 8,
+			-- 	width = 65,
+			-- 	height = 108,
+			-- 	frame_count = 25,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.0625 + opts.shift[1], -0.64844 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-09.png",
+			-- 	line_length = 8,
+			-- 	width = 64,
+			-- 	height = 101,
+			-- 	frame_count = 25,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.03125 + opts.shift[1], -0.695315 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-08.png",
+			-- 	line_length = 8,
+			-- 	width = 50,
+			-- 	height = 98,
+			-- 	frame_count = 32,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {-0.0546875 + opts.shift[1], -0.77344 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-07.png",
+			-- 	line_length = 8,
+			-- 	width = 54,
+			-- 	height = 84,
+			-- 	frame_count = 32,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {0.015625 + opts.shift[1], -0.640625 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-06.png",
+			-- 	line_length = 8,
+			-- 	width = 65,
+			-- 	height = 92,
+			-- 	frame_count = 32,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {0 + opts.shift[1], -0.83594 + opts.shift[2]}
+			-- }, {
+			-- 	filename = "__base__/graphics/entity/fire-flame/fire-flame-05.png",
+			-- 	line_length = 8,
+			-- 	width = 59,
+			-- 	height = 103,
+			-- 	frame_count = 32,
+			-- 	axially_symmetrical = false,
+			-- 	direction_count = 1,
+			-- 	blend_mode = fire_blend_mode,
+			-- 	animation_speed = fire_animation_speed,
+			-- 	scale = fire_scale,
+			-- 	tint = fire_tint,
+			-- 	flags = fire_flags,
+			-- 	shift = {0.03125 + opts.shift[1], -0.882815 + opts.shift[2]}
+			-- },
 			{
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-13.png",
-				line_length = 8,
-				width = 60,
-				height = 118,
-				frame_count = 25,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.0390625 + opts.shift[1], -0.90625 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-12.png",
-				line_length = 8,
-				width = 63,
-				height = 116,
-				frame_count = 25,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.015625 + opts.shift[1], -0.914065 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-11.png",
-				line_length = 8,
-				width = 61,
-				height = 122,
-				frame_count = 25,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.0078125 + opts.shift[1], -0.90625 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-10.png",
-				line_length = 8,
-				width = 65,
-				height = 108,
-				frame_count = 25,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.0625 + opts.shift[1], -0.64844 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-09.png",
-				line_length = 8,
-				width = 64,
-				height = 101,
-				frame_count = 25,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.03125 + opts.shift[1], -0.695315 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-08.png",
-				line_length = 8,
-				width = 50,
-				height = 98,
-				frame_count = 32,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {-0.0546875 + opts.shift[1], -0.77344 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-07.png",
-				line_length = 8,
-				width = 54,
-				height = 84,
-				frame_count = 32,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {0.015625 + opts.shift[1], -0.640625 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-06.png",
-				line_length = 8,
-				width = 65,
-				height = 92,
-				frame_count = 32,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {0 + opts.shift[1], -0.83594 + opts.shift[2]}
-			}, {
-				filename = "__base__/graphics/entity/fire-flame/fire-flame-05.png",
-				line_length = 8,
-				width = 59,
-				height = 103,
-				frame_count = 32,
-				axially_symmetrical = false,
-				direction_count = 1,
-				blend_mode = fire_blend_mode,
-				animation_speed = fire_animation_speed,
-				scale = fire_scale,
-				tint = fire_tint,
-				flags = fire_flags,
-				shift = {0.03125 + opts.shift[1], -0.882815 + opts.shift[2]}
-			}, {
 				filename = "__base__/graphics/entity/fire-flame/fire-flame-04.png",
 				line_length = 8,
 				width = 67,
@@ -520,7 +521,7 @@ function get_fireutil()
 		local fire_animation_speed = opts.animation_speed or 0.5
 		local fire_scale = opts.scale or 1
 		local fire_tint = {r = 1, g = 1, b = 1, a = 1}
-		local fire_flags = {"compressed"}
+		local fire_flags = {} -- TODO: recheck "compressed"
 		local retval = {
 			{
 				filename = "__base__/graphics/entity/fire-flame/tree-fire-flame-01-a.png",

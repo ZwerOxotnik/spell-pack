@@ -50,34 +50,35 @@ spells = {
 		func = function(player, position)
 			local force = player.force
 			local level = min(25, max(0, floor(force.get_ammo_damage_modifier("flamethrower") * 5)))
-			if not global.friendly_fire[force.name] then
-				global.friendly_fire[force.name] = {friendly_fire = force.friendly_fire}
-			elseif global.friendly_fire[force.name].tick <= game.tick then
-				global.friendly_fire[force.name].friendly_fire = force.friendly_fire
+			if not storage.friendly_fire[force.name] then
+				storage.friendly_fire[force.name] = {friendly_fire = force.friendly_fire}
+			elseif storage.friendly_fire[force.name].tick <= game.tick then
+				storage.friendly_fire[force.name].friendly_fire = force.friendly_fire
 			end
 			force.friendly_fire = false
 			if player.vehicle then
 				local vehicle = player.vehicle
 				if not vehicle.prototype.max_energy_usage or vehicle.prototype.max_energy_usage == 0 then
-					error(player, "Has no motor")
+					inform_error(player, "Has no motor")
 					return false
 				end
 				-- TODO: improve (add support for several players)
 				for i = 1, 120, 3 do
-					global.on_osp_sprint_vehicle_data[game.tick + i] = {vehicle = vehicle, player = player, level = level}
+					storage.on_osp_sprint_vehicle_data[game.tick + i] = {vehicle = vehicle, player = player, level = level}
 				end
 
-				global.friendly_fire[force.name].tick = max(
-					global.friendly_fire[force.name].tick or 1,
+				storage.friendly_fire[force.name].tick = max(
+					storage.friendly_fire[force.name].tick or 1,
 					game.tick + 241
 				)
-				if not global.on_tick[game.tick + 241] then
-					global.on_tick[game.tick + 241] = {}
+				if not storage.on_tick[game.tick + 241] then
+					storage.on_tick[game.tick + 241] = {}
 				end
-				table.insert(global.on_tick[game.tick + 241], {
+				table.insert(storage.on_tick[game.tick + 241], {
 					func = function(vars)
-						if game.tick == global.friendly_fire[vars.force.name].tick then
-							vars.force.friendly_fire = global.friendly_fire[vars.force.name].friendly_fire
+						local force = vars.force
+						if game.tick == storage.friendly_fire[force.name].tick then
+							force.friendly_fire = storage.friendly_fire[force.name].friendly_fire
 						end
 					end,
 					vars = {force = force}
@@ -106,16 +107,16 @@ spells = {
 				end
 				-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
 				-- force.character_running_speed_modifier = force.character_running_speed_modifier + 1
-				-- if not global.on_tick[game.tick + 180] then global.on_tick[game.tick + 180] = {} end
-				-- table.insert(global.on_tick[game.tick + 180], {func = function (vars)
+				-- if not storage.on_tick[game.tick + 180] then storage.on_tick[game.tick + 180] = {} end
+				-- table.insert(storage.on_tick[game.tick + 180], {func = function (vars)
 				--	vars.force.character_running_speed_modifier  = max(0,vars.force.character_running_speed_modifier - 1)
 				-- end,vars = {player = player}})
 
 				for i = 1, 180 do
-					if not global.on_tick[game.tick + i * 1] then
-						global.on_tick[game.tick + i * 1] = {}
+					if not storage.on_tick[game.tick + i * 1] then
+						storage.on_tick[game.tick + i * 1] = {}
 					end
-					table.insert(global.on_tick[game.tick + i * 1], {
+					table.insert(storage.on_tick[game.tick + i * 1], {
 						func = function(vars)
 							local _player = vars.player
 							if _player.character and _player.character.valid then
@@ -165,17 +166,17 @@ spells = {
 					})
 				end
 				local tick = game.tick + 361
-				global.friendly_fire[force.name].tick = max(
-					global.friendly_fire[force.name].tick or 1,
+				storage.friendly_fire[force.name].tick = max(
+					storage.friendly_fire[force.name].tick or 1,
 					tick
 				)
-				if not global.on_tick[tick] then
-					global.on_tick[tick] = {}
+				if not storage.on_tick[tick] then
+					storage.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[tick], {
+				table.insert(storage.on_tick[tick], {
 					func = function(vars)
-						if game.tick == global.friendly_fire[vars.force.name].tick then
-							vars.force.friendly_fire = global.friendly_fire[vars.force.name].friendly_fire
+						if game.tick == storage.friendly_fire[vars.force.name].tick then
+							vars.force.friendly_fire = storage.friendly_fire[vars.force.name].friendly_fire
 						end
 					end,
 					vars = {force = force}
@@ -196,20 +197,20 @@ spells = {
 		no_target = false,
 		func = function(player, position)
 			if distance(player.position, position) < 50 then
-				for id, ghost in pairs(global.died_ghosts) do
+				for id, ghost in pairs(storage.died_ghosts) do
 					if ghost.valid then
 						if distance(ghost.position, position) < 8 then
 							ghost.surface.create_entity{name = "osp_revive_fx", position = ghost.position}
 							ghost.revive{raise_revive = true}
-							global.died_ghosts[id] = nil
+							storage.died_ghosts[id] = nil
 						end
 					else
-						global.died_ghosts[id] = nil
+						storage.died_ghosts[id] = nil
 					end
 				end
 				return true
 			else
-				error(player, "out of range...")
+				inform_error(player, "out of range...")
 				return false
 			end
 		end,
@@ -224,7 +225,6 @@ spells = {
 					scale = 0.5
 				}
 			},
-			collision_mask = {}
 		}
 	},
 	["osp_recharge"] = {
@@ -238,7 +238,7 @@ spells = {
 		func = function(player, position)
 			local target_entity = player.vehicle or player.character
 			if not target_entity.grid then
-				error(player, "No batteries")
+				inform_error(player, "No batteries")
 				return false
 			end
 			if target_entity.type ~= "locomotive" and target_entity.type ~= "cargo-wagon" and target_entity.type ~= "fluid-wagon" and
@@ -251,10 +251,10 @@ spells = {
 			end
 			local vars = {target_entity = target_entity}
 			for i = 1, 10 do
-				if not global.on_tick[game.tick + i * 60 - 59] then
-					global.on_tick[game.tick + i * 60 - 59] = {}
+				if not storage.on_tick[game.tick + i * 60 - 59] then
+					storage.on_tick[game.tick + i * 60 - 59] = {}
 				end
-				table.insert(global.on_tick[game.tick + i * 60 - 59], {
+				table.insert(storage.on_tick[game.tick + i * 60 - 59], {
 					func = function(vars)
 						if vars.target_entity and vars.target_entity.valid and vars.target_entity.grid then
 							local batteries = 0
@@ -305,10 +305,10 @@ spells = {
 			local new_speed = old_speed + 10
 			player.force.manual_crafting_speed_modifier = new_speed
 			local vars = {old_speed = old_speed, new_speed = new_speed, player = player}
-			if not global.on_tick[game.tick + 300] then
-				global.on_tick[game.tick + 300] = {}
+			if not storage.on_tick[game.tick + 300] then
+				storage.on_tick[game.tick + 300] = {}
 			end
-			table.insert(global.on_tick[game.tick + 300], {
+			table.insert(storage.on_tick[game.tick + 300], {
 				func = function(vars)
 					vars.player.force.manual_crafting_speed_modifier = max(0, vars.old_speed +
 									vars.player.force.manual_crafting_speed_modifier - vars.new_speed)
@@ -345,15 +345,15 @@ spells = {
 				player.surface.create_entity{name = "osp_teleport-sticker", position = player.position, target = player.character}
 				-- player.character.active = false
 				local vars = {player = player, closest_building = closest_building, position = position}
-				if not global.on_tick[game.tick + 420] then
-					global.on_tick[game.tick + 420] = {}
+				if not storage.on_tick[game.tick + 420] then
+					storage.on_tick[game.tick + 420] = {}
 				end
-				table.insert(global.on_tick[game.tick + 420], {
+				table.insert(storage.on_tick[game.tick + 420], {
 					func = function(vars)
 						if vars.player.character and vars.player.character.valid then
 							-- vars.player.character.active = true
 							if vars.closest_building and vars.closest_building.valid then
-								-- position = vars.player.surface.find_non_colliding_position("character",closest_building.position,10,0.1)
+								-- position = vars.player.surf.find_non_colliding_position("character",closest_building.position,10,0.1)
 								local position = vars.player.surface.find_non_colliding_position("character", vars.position, 10, 0.1)
 								if not position then
 									return
@@ -367,13 +367,11 @@ spells = {
 				})
 				return true
 			else
-				player.surface.create_entity{
-					name = "flying-text",
-					position = position,
-					text = "no buildings nearby",
-					render_player_index = player.index
+				player.create_local_flying_text{
+					create_at_cursor = true,
+					time_to_live = 120,
+					text = "no buildings nearby" -- TODO: add localization
 				}
-				return false
 			end
 		end
 	},
@@ -419,9 +417,9 @@ spells = {
 						target = ent
 					}
 					if sticker_lvl then
-						ent.damage((7 + level) / 110 * (2 + level / 14) * ent.prototype.max_health, player.force, "explosion") -- 42
+						ent.damage((7 + level) / 110 * (2 + level / 14) * ent.max_health, player.force, "explosion") -- 42
 					else
-						ent.damage((7 + level) / 110 * ent.prototype.max_health, player.force, "explosion") -- 14
+						ent.damage((7 + level) / 110 * ent.max_health, player.force, "explosion") -- 14
 					end
 				end
 			end
@@ -497,7 +495,7 @@ spells = {
 			local old_game_speed = game.speed
 			game.speed = 0.5
 			local attackspeeds = {}
-			for a in pairs(game.ammo_category_prototypes) do
+			for a in pairs(prototypes.ammo_category) do
 				attackspeeds[a] = force.get_gun_speed_modifier(a) + 1
 				force.set_gun_speed_modifier(a, force.get_gun_speed_modifier(a) + attackspeeds[a])
 			end
@@ -507,10 +505,10 @@ spells = {
 				old_game_speed = old_game_speed,
 				attackspeeds = attackspeeds
 			}
-			if not global.on_tick[game.tick + 300] then
-				global.on_tick[game.tick + 300] = {}
+			if not storage.on_tick[game.tick + 300] then
+				storage.on_tick[game.tick + 300] = {}
 			end
-			table.insert(global.on_tick[game.tick + 300], {
+			table.insert(storage.on_tick[game.tick + 300], {
 				func = function(vars)
 					local _force = vars.player.force
 					_force.character_running_speed_modifier = max(
@@ -525,8 +523,8 @@ spells = {
 				vars = vars
 			})
 			-- for i=1,30 do
-			--	if not global.on_tick[game.tick + i*10] then global.on_tick[game.tick + i*10] = {} end
-			--	table.insert(global.on_tick[game.tick + i*10], function ()
+			--	if not storage.on_tick[game.tick + i*10] then storage.on_tick[game.tick + i*10] = {} end
+			--	table.insert(storage.on_tick[game.tick + i*10], function ()
 			--		if player.character and player.character.valid then
 			--			player.surface.create_entity{name = "osp_blink_fx", position=player.position}
 			--		end
@@ -548,15 +546,15 @@ spells = {
 			local tick
 			for i = 1, 600 do
 				tick = game.tick + i
-				if not global.on_tick[tick] then
-					global.on_tick[tick] = {}
+				if not storage.on_tick[tick] then
+					storage.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[tick], {
+				table.insert(storage.on_tick[tick], {
 					func = function(vars)
 						local _player = vars.player
 						local character = vars.character
 						local player_index = _player.index
-						local player_data = global.players[player_index]
+						local player_data = storage.players[player_index]
 						local entity = player_data.repair_radius
 						if character and character.valid then
 							if entity and entity.valid then
@@ -573,21 +571,21 @@ spells = {
 									not _entity.has_flag("breaths-air") and not _entity.has_flag("not-repairable")
 									and _entity.get_health_ratio() < 1
 								then
-									if global.repairing[_entity.unit_number] then
-										global.repairing[_entity.unit_number].tick = game.tick
+									if storage.repairing[_entity.unit_number] then
+										storage.repairing[_entity.unit_number].tick = game.tick
 									else
 										if _entity.type == "locomotive" or _entity.type == "cargo-wagon"
 											or _entity.type == "fluid-wagon" or _entity.type == "artillery-wagon"
 										then
-											global.repairing[_entity.unit_number] = {entity = _entity, tick = game.tick, fx = nil}
+											storage.repairing[_entity.unit_number] = {entity = _entity, tick = game.tick, fx = nil}
 										elseif _entity.type == "car" then
-											global.repairing[_entity.unit_number] = {
+											storage.repairing[_entity.unit_number] = {
 												entity = _entity,
 												tick = game.tick,
 												fx = _entity.surface.create_entity{name = "osp_repair-sticker", position = _entity.position, target = _entity}
 											}
 										else
-											global.repairing[_entity.unit_number] = {
+											storage.repairing[_entity.unit_number] = {
 												entity = _entity,
 												tick = game.tick,
 												fx = _entity.surface.create_entity{name = "osp_repair_fx", position = _entity.position}
@@ -605,14 +603,14 @@ spells = {
 					vars = vars
 				})
 			end
-			if not global.on_tick[game.tick + 601] then
-				global.on_tick[game.tick + 601] = {}
+			if not storage.on_tick[game.tick + 601] then
+				storage.on_tick[game.tick + 601] = {}
 			end
-			table.insert(global.on_tick[game.tick + 601], {
+			table.insert(storage.on_tick[game.tick + 601], {
 				func = function(vars)
 					local player_index = vars.player.index
-					local player_data = global.players[player_index]
-					local entity = global.players[player_index].repair_radius
+					local player_data = storage.players[player_index]
+					local entity = storage.players[player_index].repair_radius
 					if entity and entity.valid then
 						entity.destroy()
 						player_data.repair_radius = nil
@@ -644,10 +642,10 @@ spells = {
 			local vars = {level = level, position = position, player = player, surface = surface, crosshair = crosshair}
 			for i = 1, 16 do
 				local tick = game.tick + floor(random() * 4 + 4) * i + 60
-				if not global.on_tick[tick] then -- TODO: check
-					global.on_tick[tick] = {}
+				if not storage.on_tick[tick] then -- TODO: check
+					storage.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[tick], {
+				table.insert(storage.on_tick[tick], {
 					func = function(vars)
 						local pos = random_point_radius(vars.position, 7)
 						local spawnpos = {pos.x - 3, pos.y - 30}
@@ -664,10 +662,10 @@ spells = {
 			end
 			for i = 1, 19 do
 				local tick = game.tick + 10 * i
-				if not global.on_tick[tick] then
-					global.on_tick[tick] = {}
+				if not storage.on_tick[tick] then
+					storage.on_tick[tick] = {}
 				end
-				table.insert(global.on_tick[tick], {
+				table.insert(storage.on_tick[tick], {
 					func = function(vars)
 						vars.surface.create_trivial_smoke{name = "osp_artillery_smoke", position = vars.position}
 					end,
@@ -675,10 +673,10 @@ spells = {
 				})
 			end
 			local tick = game.tick + 110 + 16 * 5
-			if not global.on_tick[tick] then
-				global.on_tick[tick] = {}
+			if not storage.on_tick[tick] then
+				storage.on_tick[tick] = {}
 			end
-			table.insert(global.on_tick[tick], {
+			table.insert(storage.on_tick[tick], {
 				func = function(vars)
 					local _crosshair = vars.crosshair
 					if _crosshair then
@@ -698,8 +696,7 @@ spells = {
 				height = 1050,
 				-- shift = util.by_pixel(-11, 4.5),
 				scale = 0.5
-			},
-			collision_mask = {}
+			}
 		}
 	}
 }

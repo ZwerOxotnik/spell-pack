@@ -1,11 +1,11 @@
 {
   "name": "m-spell-pack",
-  "version": "0.20.22",
+  "version": "0.20.23",
   "title": "Spell Pack",
   "author": "OwnlyMe",
   "contact": "zweroxotnik@gmail.com, Discord:ZwerOxotnik#7117",
   "homepage": "",
-  "factorio_version": "1.1",
+  "factorio_version": "2.0",
   "dependencies": [
 		"base",
 		"! spell-pack"

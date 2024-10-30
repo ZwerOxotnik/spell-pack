@@ -50,9 +50,10 @@ local rec_temp = {
 	name = "wooden-chest",
 	ingredients = {}, -- {"wood", 2}},
 	energy_required = 1,
-	result = "wooden-chest",
 	enabled = true
 }
+rec_temp.results = {{type = "item", name = rec_temp.name, amount = 1}}
+
 local dummy_grenade = table.deepcopy(data.raw.capsule.grenade)
 dummy_grenade.stack_size = 500
 dummy_grenade.subgroup = "osp_spells"
@@ -66,11 +67,10 @@ dummy_projectile.acceleration = 1
 local dummy_explosion = table.deepcopy(data.raw.explosion["big-explosion"])
 dummy_explosion.name = "osp_fireball"
 dummy_explosion.flags = {"not-on-map", "placeable-off-grid"}
-dummy_explosion.collision_mask = {}
 dummy_explosion.animations = {
 	{
 		filename = "__m-spell-pack__/graphics/empty.png",
-		flags = {"compressed"},
+		flags = {}, -- TODO: recheck "compressed"
 		width = 1,
 		height = 1,
 		frame_count = 1,
@@ -98,13 +98,13 @@ for name, spell in pairs(spells) do
 		end
 		local description_data = {}
 		if (spell.mana_cost > 0) then
-			description_data[#description_data + 1] = {"osp.mana_desc", spell.mana_cost}
+			description_data[#description_data + 1] = {"osp.mana_desc", tostring(spell.mana_cost)}
 		end
 		if (spell.spirit_cost > 0) then
-			description_data[#description_data + 1] = {"osp.spirit_desc", spell.spirit_cost}
+			description_data[#description_data + 1] = {"osp.spirit_desc", tostring(spell.spirit_cost)}
 		end
 		if (spell.cooldown > 1) then
-			description_data[#description_data + 1] = {"osp.cooldown_desc", spell.cooldown}
+			description_data[#description_data + 1] = {"osp.cooldown_desc", tostring(spell.cooldown)}
 		end
 		item.localised_description = {"", {"osp." .. name .. "_desc"}, "\n", table.unpack(description_data)}
 		local ent = table.deepcopy(ent_temp)
@@ -117,7 +117,8 @@ for name, spell in pairs(spells) do
 		end
 		local rec = table.deepcopy(rec_temp)
 		rec.name = name
-		rec.result = name
+		rec.results = {{type = "item", name = name, amount = 1}}
+
 		data:extend({item, ent, rec})
 	elseif spell.dummy == "grenade" then
 		local grenade = table.deepcopy(dummy_grenade)
@@ -129,13 +130,13 @@ for name, spell in pairs(spells) do
 		grenade.capsule_action.attack_parameters.range = spell.range
 		local description_data = {}
 		if (spell.mana_cost > 0) then
-			description_data[#description_data + 1] = {"osp.mana_desc", spell.mana_cost}
+			description_data[#description_data + 1] = {"osp.mana_desc", tostring(spell.mana_cost)}
 		end
 		if (spell.spirit_cost > 0) then
-			description_data[#description_data + 1] = {"osp.spirit_desc", spell.spirit_cost}
+			description_data[#description_data + 1] = {"osp.spirit_desc", tostring(spell.spirit_cost)}
 		end
 		if (spell.cooldown > 1) then
-			description_data[#description_data + 1] = {"osp.cooldown_desc", spell.cooldown}
+			description_data[#description_data + 1] = {"osp.cooldown_desc", tostring(spell.cooldown)}
 		end
 		grenade.localised_description = {"", {"osp." .. name .. "_desc"}, "\n", table.unpack(description_data)}
 		-- grenade.capsule_action.attack_parameters.ammo_category = "osp_fireball"
@@ -146,11 +147,11 @@ for name, spell in pairs(spells) do
 		projectile.name = name .. "-projectile"
 		-- projectile.animation = fireutil.create_fire_pictures({ blend_mode = "normal", animation_speed = 1, scale = 0.6})
 		projectile.action[1].action_delivery.target_effects[1].entity_name = name
-		projectile.action[1].action_delivery.target_effects[1].trigger_created_entity = "true"
+		projectile.action[1].action_delivery.target_effects[1].trigger_created_entity = true
 
 		local recipe = table.deepcopy(rec_temp)
 		recipe.name = name
-		recipe.result = name
+		recipe.results = {{type = "item", name = name, amount = 1}}
 
 		local explosion = table.deepcopy(dummy_explosion)
 		explosion.name = name
@@ -166,8 +167,8 @@ for name, spell in pairs(spells) do
 				explosion[a] = b
 			end
 		end
-		data:extend({grenade, projectile, recipe, explosion})
 
+		data:extend({grenade, projectile, recipe, explosion})
 	end
 end
 
@@ -260,7 +261,6 @@ data:extend({
 		-- corpse = "small-remnants",
 		-- collision_box = {{-0.35, -0.35}, {0.35, 0.35}},
 		-- selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
-		collision_mask = {},
 		picture = {
 			filename = "__m-spell-pack__/graphics/radius_visualization.png",
 			priority = "extra-high",
@@ -382,7 +382,7 @@ data:extend({
 			action_delivery = {
 				type = "instant",
 				target_effects = {
-					{type = "create-entity", entity_name = "osp_absorb_explosion", trigger_created_entity = "true"}
+					{type = "create-entity", entity_name = "osp_absorb_explosion", trigger_created_entity = true}
 					-- {
 					--  type = "damage",
 					--  damage = {amount = 0, type = "explosion"}
