@@ -11,11 +11,11 @@ local version = 19
 
 remote.add_interface("spell-pack", {
 	get = function(field)
-		return global[field]
+		return storage[field]
 	end,
 	set = function(field, value)
-		if global[field] then
-			global[field] = value
+		if storage[field] then
+			storage[field] = value
 			return true
 		else
 			return false
