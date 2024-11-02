@@ -75,9 +75,9 @@ remote.add_interface("spell-pack", {
 		storage.forces[force.name].bonus_effects[spell_name] = value
 	end,
 	loadeffect = function(effect_id, func)
-		storage.effects[effect_id] = load(func)
-		if not type(storage.effects[effect_id]) == "function" then
-			inform_error("couldn't load function")
+		storage.effects[effect_id] = func -- We can't load(func) in storage
+		if type(storage.effects[effect_id]) ~= "string" then -- TODO: recheck
+			inform_error("Wrong type to store a function")
 		end
 	end,
 	getstats = function(player)
@@ -850,7 +850,7 @@ script.on_event(defines.events.on_entity_died, function(event)
 	end
 	-- if event.cause and event.cause.name == "character" and not event.entity.force.get_friend(event.cause.force) then
 	--	local killer_index = event.cause.player.index
-	--	storage.players[killer_index].spirit = min(storage.players[killer_index].max_spirit,global.players[killer_index].spirit +global.players[killer_index].spirit_per_kill)
+	--	storage.players[killer_index].spirit = min(storage.players[killer_index].max_spirit,storage.players[killer_index].spirit +global.players[killer_index].spirit_per_kill)
 	-- end
 end)
 
