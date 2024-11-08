@@ -299,8 +299,9 @@ spells = {
 		dummy = "building",
 		no_target = true,
 		func = function(player, position)
-			-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
-			player.surface.create_entity{name = "osp_gears-sticker", position = player.position, target = player.character}
+			local character = player.character
+			-- character.surface.create_entity{name = "osp_blink_fx", position=player.position}
+			character.surface.create_entity{name = "osp_gears-sticker", position = character.position, target = character}
 			local old_speed = player.force.manual_crafting_speed_modifier
 			local new_speed = old_speed + 10
 			player.force.manual_crafting_speed_modifier = new_speed
@@ -342,24 +343,27 @@ spells = {
 				end
 			end
 			if closest_building then
-				player.surface.create_entity{name = "osp_teleport-sticker", position = player.position, target = player.character}
-				-- player.character.active = false
+				local character = player.character
+				character.surface.create_entity{name = "osp_teleport-sticker", position = character.position, target = character}
+				-- character.active = false
 				local vars = {player = player, closest_building = closest_building, position = position}
 				if not storage.on_tick[game.tick + 420] then
 					storage.on_tick[game.tick + 420] = {}
 				end
+				-- TODO: fix it, it can't be factorio as function, save it as a string!!!
 				table.insert(storage.on_tick[game.tick + 420], {
 					func = function(vars)
-						if vars.player.character and vars.player.character.valid then
-							-- vars.player.character.active = true
+						local character = vars.player.character
+						if character and character.valid then
+							-- character.active = true
 							if vars.closest_building and vars.closest_building.valid then
-								-- position = vars.player.surf.find_non_colliding_position("character",closest_building.position,10,0.1)
-								local position = vars.player.surface.find_non_colliding_position("character", vars.position, 10, 0.1)
+								-- position = character.surf.find_non_colliding_position("character",closest_building.position,10,0.1)
+								local position = character.surface.find_non_colliding_position("character", vars.position, 10, 0.1)
 								if not position then
 									return
 								end
-								vars.player.teleport(position)
-								vars.player.surface.create_entity{name = "osp_blink_fx", position = position}
+								character.teleport(position)
+								character.surface.create_entity{name = "osp_blink_fx", position = position}
 							end
 						end
 					end,
@@ -488,8 +492,9 @@ spells = {
 		no_target = true,
 		func = function(player, position)
 			local force = player.force
-			-- player.surface.create_entity{name = "osp_blink_fx", position=player.position}
-			player.surface.create_entity{name = "osp_stopwatch-sticker", position = player.position, target = player.character}
+			local character = player.character
+			-- character.surface.create_entity{name = "osp_blink_fx", position=player.position}
+			character.surface.create_entity{name = "osp_stopwatch-sticker", position = character.position, target = character.character}
 			local running_speed_modifier = force.character_running_speed_modifier + player.character_running_speed_modifier + 1
 			force.character_running_speed_modifier = force.character_running_speed_modifier + running_speed_modifier
 			local old_game_speed = game.speed
@@ -525,8 +530,8 @@ spells = {
 			-- for i=1,30 do
 			--	if not storage.on_tick[game.tick + i*10] then storage.on_tick[game.tick + i*10] = {} end
 			--	table.insert(storage.on_tick[game.tick + i*10], function ()
-			--		if player.character and player.character.valid then
-			--			player.surface.create_entity{name = "osp_blink_fx", position=player.position}
+			--		if character and character.valid then
+			--			character.surface.create_entity{name = "osp_blink_fx", position=character.position}
 			--		end
 			--	end)
 			-- end
