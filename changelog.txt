@@ -2,7 +2,7 @@
 Version: 0.20.28
 Date: 2025-04-29
   Bugfixes:
-    - Updated Russian translation (thanks to @cybinv777 (Chasovoy) on crowdin)
+    - Fixed crash when Timewarp was used
 ---------------------------------------------------------------------------------------------------
 Version: 0.20.27
 Date: 2024-11-09
