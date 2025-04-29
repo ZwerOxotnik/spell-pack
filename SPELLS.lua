@@ -493,8 +493,10 @@ spells = {
 		func = function(player, position)
 			local force = player.force
 			local character = player.character
+			if not (character and character.valid) then return end -- TODO: recheck if the line the matters
+
 			-- character.surface.create_entity{name = "osp_blink_fx", position=player.position}
-			character.surface.create_entity{name = "osp_stopwatch-sticker", position = character.position, target = character.character}
+			character.surface.create_entity{name = "osp_stopwatch-sticker", position = character.position, target = character}
 			local running_speed_modifier = force.character_running_speed_modifier + player.character_running_speed_modifier + 1
 			force.character_running_speed_modifier = force.character_running_speed_modifier + running_speed_modifier
 			local old_game_speed = game.speed
